@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>Acme.Server</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.14" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Acme.Client\Acme.Client.csproj" />
+    <ProjectReference Include="..\Acme.Shared\Acme.Shared.csproj" />
+  </ItemGroup>
+</Project>

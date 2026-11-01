@@ -1,0 +1,11 @@
+[
+  {
+    "Name": "Acme",
+    "Projects": [
+      {
+        "Path": "Acme.Server\\Acme.Server.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

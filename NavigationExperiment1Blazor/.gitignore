@@ -1,0 +1,24 @@
+**/bin/
+**/obj/
+.vs/
+**/.vs/
+
+# Lokale Datenbank und SQLite-Journaldateien
+Acme.Server/App_Data/*.db
+Acme.Server/App_Data/*.db-shm
+Acme.Server/App_Data/*.db-wal
+
+# Lokale Visual-Studio-Benutzereinstellungen
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Testergebnisse und lokale Buildausgaben
+TestResults/
+**/TestResults/
+coverage/
+coverage.*
+artifacts/
+**/publish/
+.nuget/

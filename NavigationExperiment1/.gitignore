@@ -1,0 +1,9 @@
+# Lokale Betriebssystemdateien
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Lokale Entwicklungsdateien
+*.log
+node_modules/
+dist/

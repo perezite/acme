@@ -1,0 +1,42 @@
+@page "/"
+@page "/{*Path}"
+@inject IJSRuntime JS
+
+<div class="app-shell">
+  <header class="topbar">
+    <button class="brand" data-action="home" aria-label="Zur Startseite">
+      <span class="brand-mark" aria-hidden="true"><svg><use href="#i-house"></use></svg></span>
+      <span class="brand-name">Acme</span>
+    </button>
+
+    <div class="topbar-center">
+      <label class="searchbox" for="global-search">
+        <svg aria-hidden="true"><use href="#i-search"></use></svg>
+        <input id="global-search" type="search" placeholder="Suchen…" autocomplete="off" />
+        <kbd>⌘ K</kbd>
+      </label>
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="icon-button" data-action="help" aria-label="Hilfe" title="Hilfe"><svg><use href="#i-help"></use></svg></button>
+      <button class="icon-button notification-button" data-action="notifications" aria-label="Benachrichtigungen" title="Benachrichtigungen"><svg><use href="#i-bell"></use></svg><span class="notification-dot"></span></button>
+      <button class="avatar-button" data-action="profile" aria-label="Profil öffnen" title="Profil"><span>ML</span><i></i></button>
+    </div>
+  </header>
+
+  <main id="app-main" class="main-content" tabindex="-1"></main>
+  <div id="overlay-root"></div>
+  <div id="onboarding-root"></div>
+  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+</div>
+
+@code {
+  [Parameter] public string? Path { get; set; }
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender)
+      await JS.InvokeVoidAsync("acmePrototype.start");
+  }
+}

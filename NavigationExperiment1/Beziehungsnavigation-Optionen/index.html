@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Beziehungsnavigation · UI-Varianten</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, "Segoe UI", Arial, sans-serif; color: #203453; background: #f3f6fa; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header { padding: 32px max(24px, calc((100vw - 1360px) / 2)); background: #fff; border-bottom: 1px solid #e3e9f0; }
+    header p { margin: 0 0 7px; color: #7f8da0; font-size: 13px; }
+    h1 { margin: 0; font-size: clamp(24px, 3vw, 34px); letter-spacing: -.7px; }
+    .intro { max-width: 680px; margin: 10px 0 0; color: #77869a; line-height: 1.55; }
+    main { max-width: 1360px; margin: 28px auto 56px; padding: 0 24px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    article { overflow: hidden; border: 1px solid #e0e7ef; border-radius: 12px; background: #fff; box-shadow: 0 5px 20px rgba(25, 48, 79, .045); }
+    .copy { min-height: 114px; padding: 17px 20px 14px; }
+    .number { display: inline-grid; width: 26px; height: 26px; margin-right: 7px; place-items: center; border-radius: 50%; background: #edf4fd; color: #3479df; font-size: 12px; font-weight: 700; vertical-align: 2px; }
+    h2 { display: inline; margin: 0; font-size: 17px; }
+    .copy p { margin: 8px 0 0 34px; color: #77869a; font-size: 13px; line-height: 1.5; }
+    .preview { display: block; width: 100%; border-top: 1px solid #e8edf3; background: #eef3f9; }
+    .open { display: flex; justify-content: flex-end; padding: 10px 18px; border-top: 1px solid #edf0f4; }
+    .open a { color: #3479df; font-size: 12px; font-weight: 600; text-decoration: none; }
+    .open a:hover { text-decoration: underline; }
+    footer { margin-top: 22px; color: #8895a5; font-size: 12px; }
+    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } main { margin-top: 18px; padding-inline: 14px; } header { padding: 24px 18px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <p>Acme · Designvergleich</p>
+    <h1>Navigation durch Objektbeziehungen</h1>
+    <p class="intro">UI-Muster für den Weg von einem Geschäftsobjekt zu seinen verknüpften Daten. Die Mockups verwenden dieselbe ruhige Farbwelt wie der Prototyp.</p>
+  </header>
+  <main>
+    <section class="grid" aria-label="Vergleich der Navigationsvarianten">
+      <article><div class="copy"><span class="number">1</span><h2>Beziehungsbereich unter der Tabelle</h2><p>Ein ausgewählter Datensatz zeigt seine verknüpften Objekte in Gruppen unterhalb der Rohdatentabelle.</p></div><img class="preview" src="01-beziehungsbereich-unter-tabelle.svg" alt="Rohdatentabelle mit einem Beziehungsbereich darunter" /><div class="open"><a href="01-beziehungsbereich-unter-tabelle.svg" target="_blank">SVG einzeln öffnen ↗</a></div></article>
+      <article><div class="copy"><span class="number">2</span><h2>Seitenpanel</h2><p>Ein Inspektor bleibt neben der Tabelle geöffnet. Datensatzdetails und Beziehungen sind schnell erreichbar.</p></div><img class="preview" src="02-seitenpanel.svg" alt="Projekttabelle mit einem seitlichen Detail- und Beziehungspanel" /><div class="open"><a href="02-seitenpanel.svg" target="_blank">SVG einzeln öffnen ↗</a></div></article>
+      <article><div class="copy"><span class="number">3</span><h2>Datensatzseite mit Reitern</h2><p>Eine eigene Seite schafft Raum für das Bearbeiten eines Objekts und seiner verschiedenen Beziehungstypen.</p></div><img class="preview" src="03-datensatzseite-mit-reitern.svg" alt="Eigene Projektseite mit Reitern und verknüpften Kundendaten" /><div class="open"><a href="03-datensatzseite-mit-reitern.svg" target="_blank">SVG einzeln öffnen ↗</a></div></article>
+      <article><div class="copy"><span class="number">4</span><h2>Beziehungstabs an der Tabelle</h2><p>Reiter wechseln zwischen Kunden, Aufgaben und Zeiteinträgen des ausgewählten Projekts.</p></div><img class="preview" src="04-beziehungstabs-in-der-tabelle.svg" alt="Tabelle mit Reitern für die unterschiedlichen Beziehungen eines Datensatzes" /><div class="open"><a href="04-beziehungstabs-in-der-tabelle.svg" target="_blank">SVG einzeln öffnen ↗</a></div></article>
+      <article><div class="copy"><span class="number">5</span><h2>Visuelle Beziehungskarte</h2><p>Ein Netzwerkdiagramm macht Verknüpfungen sichtbar und kann direkt zu den einzelnen Datensätzen führen.</p></div><img class="preview" src="05-visuelle-beziehungskarte.svg" alt="Beziehungskarte mit Projekt, Kunde, Aufgaben und Zeiteinträgen" /><div class="open"><a href="05-visuelle-beziehungskarte.svg" target="_blank">SVG einzeln öffnen ↗</a></div></article>
+      <article><div class="copy"><span class="number">6</span><h2>Direkt anklickbare Beziehungsfelder</h2><p>Beziehungswerte in der Tabelle öffnen den passenden Datensatz direkt und halten die Aktionsspalte schlank.</p></div><img class="preview" src="06-direkte-relationsfelder.svg" alt="Projekttabelle mit direkt anklickbaren Kundenbeziehungen in den Zellen" /><div class="open"><a href="06-direkte-relationsfelder.svg" target="_blank">SVG einzeln öffnen ↗</a></div></article>
+      <article><div class="copy"><span class="number">7</span><h2>Master-Target-Ansicht</h2><p>Die obere Master-Tabelle steuert die untere Target-Tabelle. Reiter wechseln zwischen Beziehungstypen; ein Target-Datensatz kann zum nächsten Master werden.</p></div><img class="preview" src="07-master-target.svg" alt="Master-Target-Ansicht mit Projekt-Mastertabelle und Kunden-Targettabelle samt Beziehungstabs" /><div class="open"><a href="07-master-target.svg" target="_blank">SVG einzeln öffnen ↗</a></div></article>
+      <article><div class="copy"><span class="number">8</span><h2>Master-Detail · Desktop</h2><p>Master- und Target-Tabelle bleiben gleichzeitig sichtbar. Die Auswahl oben steuert die Beziehungstabelle darunter.</p></div><img class="preview" src="08-master-detail-desktop.svg" alt="Desktop-Ansicht mit Projekttabelle oben und tabbasierter Kundentabelle darunter" /><div class="open"><a href="08-master-detail-desktop.svg" target="_blank">SVG einzeln öffnen ↗</a></div></article>
+      <article><div class="copy"><span class="number">9</span><h2>Master-Detail · Mobile</h2><p>Auf dem Smartphone führt ein Drill-down von der Masterliste zur Target-Ansicht und weiter zum nächsten Master.</p></div><img class="preview" src="09-master-detail-mobile.svg" alt="Zwei Smartphone-Ansichten für Masterliste und Target-Beziehungen" /><div class="open"><a href="09-master-detail-mobile.svg" target="_blank">SVG einzeln öffnen ↗</a></div></article>
+      <article><div class="copy"><span class="number">10</span><h2>Master-Detail · Mobile bearbeiten</h2><p>Master- und Target-Felder lassen sich direkt auf dem Smartphone ändern. Beziehungen bleiben erreichbar; ein klarer Speicherbereich fasst die Änderungen zusammen.</p></div><img class="preview" src="10-master-detail-mobile-bearbeiten.svg" alt="Smartphone-Ansicht mit editierbaren Feldern für den Master Projekt und den Target Kunde" /><div class="open"><a href="10-master-detail-mobile-bearbeiten.svg" target="_blank">SVG einzeln öffnen ↗</a></div></article>
+      <article><div class="copy"><span class="number">11</span><h2>Master-Detail · iPhone SE</h2><p>Die Ansicht ist auf 375 × 667 CSS-Pixel ausgelegt: beide Datensätze bleiben editierbar, während die Speicheraktion unten erreichbar bleibt.</p></div><img class="preview" src="11-master-detail-iphone-se.svg" alt="Maßstäbliche Master-Detail-Bearbeitung auf dem 375 mal 667 Pixel großen Viewport eines iPhone SE" /><div class="open"><a href="11-master-detail-iphone-se.svg" target="_blank">SVG einzeln öffnen ↗</a></div></article>
+      <article><div class="copy"><span class="number">12</span><h2>Master-Auswahl · iPhone SE</h2><p>Eine Suchansicht mit scrollbarer Ergebnisliste skaliert auf viele Datensätze. Ein Tap übernimmt das Projekt als Master und führt zur Detailansicht zurück.</p></div><img class="preview" src="12-master-picker-iphone-se.svg" alt="iPhone-SE-Ansicht mit Suchfeld und scrollbarer Projektliste zur Auswahl eines Masterdatensatzes" /><div class="open"><a href="12-master-picker-iphone-se.svg" target="_blank">SVG einzeln öffnen ↗</a></div></article>
+    </section>
+    <footer>Eigenständige SVG-Illustrationen · skalierbar und ohne externe Bibliotheken</footer>
+  </main>
+</body>
+</html>

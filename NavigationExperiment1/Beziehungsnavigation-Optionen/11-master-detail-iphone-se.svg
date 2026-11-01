@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 930" role="img" aria-labelledby="title desc" fill="#203453">
+<title id="title">Master-Detail-Bearbeitung auf einem iPhone SE</title>
+<desc id="desc">Maßstäbliche Bildschirmfläche von 375 mal 667 CSS-Pixeln. Die kompakte Ansicht zeigt editierbare Projektfelder, Beziehungstabs, editierbare Kundenfelder sowie eine unten erreichbare Speicheraktion.</desc>
+<defs>
+  <linearGradient id="canvas" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8fafd"/><stop offset="1" stop-color="#eef3f9"/></linearGradient>
+  <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4c91f1"/><stop offset="1" stop-color="#3474d9"/></linearGradient>
+  <filter id="shadow" x="-15%" y="-10%" width="130%" height="135%"><feDropShadow dx="0" dy="7" stdDeviation="12" flood-color="#18345b" flood-opacity=".12"/></filter>
+  <style>text{font-family:Inter,"Segoe UI",Arial,sans-serif}.muted{fill:#8290a3}.blueText{fill:#3479df}.small{font-size:12px}.tiny{font-size:11px}.line{stroke:#e7ecf2;stroke-width:1}.field{fill:#fff;stroke:#e0e7ef;stroke-width:1}.label{fill:#8290a3;font-size:11px}.value{fill:#203453;font-size:12px}</style>
+</defs>
+<rect width="760" height="930" fill="url(#canvas)"/>
+<text x="42" y="48" class="muted small">Acme · Kompaktes Mobile-Mockup</text>
+<text x="42" y="82" font-size="24" font-weight="700">Master-Detail · iPhone SE</text>
+<text x="42" y="108" class="muted small">Beide Datensätze editierbar · Scrollen bleibt bei Bedarf möglich</text>
+
+<!-- iPhone SE body; screen is drawn at its 375 × 667 CSS-pixel viewport -->
+<rect x="177" y="132" width="406" height="744" rx="49" fill="#182435" filter="url(#shadow)"/>
+<rect x="187" y="142" width="386" height="724" rx="41" fill="#101721"/>
+<rect x="192" y="163" width="375" height="667" rx="4" fill="#fff"/>
+<circle cx="380" cy="850" r="22" fill="#131b25" stroke="#364252" stroke-width="2"/>
+<circle cx="380" cy="850" r="8" fill="none" stroke="#293544" stroke-width="1.5"/>
+
+<!-- 375 × 667 viewport -->
+<text x="207" y="181" font-size="10" font-weight="700">9:41</text>
+<text x="552" y="181" text-anchor="end" font-size="9" font-weight="700">●●●  ▰</text>
+<path d="M192 187H567" stroke="#edf0f4"/>
+<rect x="192" y="188" width="375" height="47" fill="#fff"/>
+<rect x="208" y="197" width="28" height="28" rx="8" fill="url(#blue)"/>
+<text x="222" y="216" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">A</text>
+<text x="244" y="216" font-size="14" font-weight="700">Acme</text>
+<text x="551" y="216" text-anchor="end" class="blueText small" font-weight="600">‹ Daten</text>
+
+<!-- Scrollable content, compact enough for this viewport -->
+<text x="208" y="252" class="muted tiny">Projekte  /  Website-Relaunch</text>
+<text x="208" y="278" font-size="18" font-weight="700">Projektdaten</text>
+
+<!-- Master card -->
+<rect x="208" y="291" width="343" height="158" rx="9" fill="#fff" stroke="#e0e7ef"/>
+<rect x="208" y="291" width="3" height="158" rx="1.5" fill="#4c91f1"/>
+<text x="222" y="311" class="blueText tiny" font-weight="700" letter-spacing=".35">MASTER · PROJEKT</text>
+<text x="537" y="311" text-anchor="end" class="muted tiny">PR-104</text>
+<rect x="218" y="319" width="323" height="41" rx="6" fill="#f8fafd" stroke="#e8edf3"/>
+<text x="228" y="344" class="label">Name</text><text x="310" y="344" class="value">Website-Relaunch</text><text x="527" y="344" text-anchor="end" class="blueText tiny">✎</text>
+<rect x="218" y="363" width="323" height="41" rx="6" class="field"/>
+<text x="228" y="388" class="label">Status</text><text x="310" y="388" class="value">In Arbeit</text><text x="527" y="388" text-anchor="end" class="blueText tiny">✎</text>
+<rect x="218" y="407" width="323" height="36" rx="6" class="field"/>
+<text x="228" y="430" class="label">Budget</text><text x="310" y="430" class="value">48.000 CHF</text><text x="527" y="430" text-anchor="end" class="blueText tiny">✎</text>
+
+<!-- Related target tabs -->
+<text x="208" y="472" font-size="12" font-weight="700">Verknüpfte Daten</text>
+<rect x="208" y="480" width="92" height="33" rx="7" fill="#edf4fd"/>
+<text x="254" y="501" text-anchor="middle" class="blueText tiny" font-weight="700">Kunden · 1</text>
+<text x="351" y="501" text-anchor="middle" class="muted tiny" font-weight="600">Aufgaben · 3</text>
+<text x="478" y="501" text-anchor="middle" class="muted tiny" font-weight="600">Zeit · 2</text>
+
+<!-- Target card -->
+<rect x="208" y="521" width="343" height="158" rx="9" fill="#fff" stroke="#e0e7ef"/>
+<rect x="208" y="521" width="3" height="158" rx="1.5" fill="#aab5c4"/>
+<text x="222" y="541" class="muted tiny" font-weight="700" letter-spacing=".35">TARGET · KUNDE</text>
+<text x="537" y="541" text-anchor="end" class="muted tiny">KD-021</text>
+<rect x="218" y="549" width="323" height="41" rx="6" fill="#f8fafd" stroke="#e8edf3"/>
+<text x="228" y="574" class="label">Name</text><text x="310" y="574" class="value">Nordlicht Studio</text><text x="527" y="574" text-anchor="end" class="blueText tiny">✎</text>
+<rect x="218" y="593" width="323" height="41" rx="6" class="field"/>
+<text x="228" y="618" class="label">Branche</text><text x="310" y="618" class="value">Design &amp; Medien</text><text x="527" y="618" text-anchor="end" class="blueText tiny">✎</text>
+<rect x="218" y="637" width="323" height="36" rx="6" class="field"/>
+<text x="228" y="660" class="label">Kontakt</text><text x="310" y="660" class="value">Mia Lehmann</text><text x="527" y="660" text-anchor="end" class="blueText tiny">✎</text>
+
+<!-- Recursive navigation -->
+<text x="208" y="699" class="blueText tiny" font-weight="600">Nordlicht Studio als Master öffnen →</text>
+<text x="551" y="699" text-anchor="end" class="muted tiny">Weitere Felder beim Scrollen</text>
+
+<!-- Fixed, compact save area -->
+<rect x="192" y="737" width="375" height="93" fill="#fff"/>
+<path d="M192 737H567" stroke="#e3e9f0"/>
+<text x="208" y="755" class="muted tiny">Änderungen in Master und Target</text>
+<rect x="208" y="763" width="343" height="42" rx="7" fill="url(#blue)"/>
+<text x="379.5" y="789" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Änderungen speichern</text>
+
+<!-- Dimension note -->
+<rect x="602" y="422" width="119" height="66" rx="9" fill="#fff" stroke="#e0e7ef"/>
+<text x="616" y="447" class="blueText tiny" font-weight="700">Viewport</text>
+<text x="616" y="468" font-size="13" font-weight="700">375 × 667 px</text>
+<path d="M602 455H578" stroke="#b8c7d9" stroke-width="1.5"/>
+<text x="602" y="515" class="muted tiny">Speichern bleibt</text>
+<text x="602" y="531" class="muted tiny">unten erreichbar.</text>
+</svg>

@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 930" role="img" aria-labelledby="title desc" fill="#203453">
+<title id="title">Master-Datensatz auf dem iPhone SE suchen und auswählen</title>
+<desc id="desc">Maßstäbliche 375 mal 667 CSS-Pixel Ansicht mit Suchfeld und scrollbarer Projektliste. Ein Tap auf einen Eintrag wählt ihn als Master aus und führt zur Master-Detail-Ansicht zurück.</desc>
+<defs>
+  <linearGradient id="canvas" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8fafd"/><stop offset="1" stop-color="#eef3f9"/></linearGradient>
+  <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4c91f1"/><stop offset="1" stop-color="#3474d9"/></linearGradient>
+  <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff" stop-opacity="0"/><stop offset=".85" stop-color="#fff" stop-opacity=".96"/></linearGradient>
+  <filter id="shadow" x="-15%" y="-10%" width="130%" height="135%"><feDropShadow dx="0" dy="7" stdDeviation="12" flood-color="#18345b" flood-opacity=".12"/></filter>
+  <clipPath id="screenClip"><rect x="192" y="163" width="375" height="667" rx="4"/></clipPath>
+  <style>text{font-family:Inter,"Segoe UI",Arial,sans-serif}.muted{fill:#8290a3}.blueText{fill:#3479df}.small{font-size:12px}.tiny{font-size:10px}.line{stroke:#e7ecf2;stroke-width:1}</style>
+</defs>
+<rect width="760" height="930" fill="url(#canvas)"/>
+<text x="42" y="48" class="muted small">Acme · Kompaktes Mobile-Mockup</text>
+<text x="42" y="82" font-size="24" font-weight="700">Master-Auswahl · iPhone SE</text>
+<text x="42" y="108" class="muted small">Suchen statt durch eine lange Dropdown-Liste scrollen</text>
+
+<!-- iPhone SE body; viewport is drawn at 375 × 667 CSS pixels -->
+<rect x="177" y="132" width="406" height="744" rx="49" fill="#182435" filter="url(#shadow)"/>
+<rect x="187" y="142" width="386" height="724" rx="41" fill="#101721"/>
+<rect x="192" y="163" width="375" height="667" rx="4" fill="#fff"/>
+<circle cx="380" cy="850" r="22" fill="#131b25" stroke="#364252" stroke-width="2"/>
+<circle cx="380" cy="850" r="8" fill="none" stroke="#293544" stroke-width="1.5"/>
+
+<g clip-path="url(#screenClip)">
+  <!-- Status and compact Acme header -->
+  <text x="207" y="181" font-size="10" font-weight="700">9:41</text>
+  <text x="552" y="181" text-anchor="end" font-size="9" font-weight="700">●●●  ▰</text>
+  <path d="M192 187H567" stroke="#edf0f4"/>
+  <rect x="192" y="188" width="375" height="47" fill="#fff"/>
+  <rect x="208" y="197" width="28" height="28" rx="8" fill="url(#blue)"/>
+  <text x="222" y="216" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">A</text>
+  <text x="244" y="216" font-size="14" font-weight="700">Acme</text>
+  <text x="551" y="216" text-anchor="end" class="blueText small" font-weight="600">‹ Zurück</text>
+
+  <!-- Search picker header -->
+  <text x="208" y="260" class="muted tiny">MASTER AUSWÄHLEN · PROJEKTE</text>
+  <text x="208" y="286" font-size="19" font-weight="700">Projekt suchen</text>
+  <text x="208" y="305" class="muted tiny">Name, Kunde oder Kennung eingeben</text>
+  <rect x="208" y="318" width="343" height="42" rx="7" fill="#f7f9fc" stroke="#dce4ee"/>
+  <circle cx="226" cy="338" r="6" fill="none" stroke="#8290a3" stroke-width="1.6"/>
+  <path d="m230.5 342.5 4.5 4.5" stroke="#8290a3" stroke-width="1.6"/>
+  <text x="244" y="342" class="muted small">Projekt oder Kunde suchen…</text>
+
+  <text x="208" y="384" font-size="11" font-weight="650">12 Projekte</text>
+  <text x="551" y="384" text-anchor="end" class="muted tiny">Zuletzt geändert</text>
+  <path d="M208 393H551" class="line"/>
+
+  <!-- Scrollable result list -->
+  <rect x="208" y="401" width="343" height="72" rx="7" fill="#f0f6fd" stroke="#bcd4f2"/>
+  <rect x="208" y="401" width="3" height="72" rx="1.5" fill="#4c91f1"/>
+  <text x="222" y="425" font-size="12" font-weight="700">Website-Relaunch</text>
+  <text x="222" y="444" class="muted tiny">Nordlicht Studio · PR-104</text>
+  <rect x="222" y="451" width="62" height="15" rx="7.5" fill="#eaf5ef"/>
+  <text x="253" y="462" text-anchor="middle" font-size="9" fill="#448265">In Arbeit</text>
+  <circle cx="530" cy="423" r="9" fill="#e3effd"/>
+  <path d="m526 423 3 3 5-6" fill="none" stroke="#3479df" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="530" y="447" text-anchor="middle" class="blueText" font-size="8" font-weight="700">AKTUELL</text>
+
+  <rect x="208" y="480" width="343" height="72" rx="7" fill="#fff" stroke="#e3e9f0"/>
+  <text x="222" y="504" font-size="12" font-weight="650">CRM-Migration</text>
+  <text x="222" y="523" class="muted tiny">Bergwerk AG · PR-101</text>
+  <rect x="222" y="530" width="62" height="15" rx="7.5" fill="#eaf5ef"/>
+  <text x="253" y="541" text-anchor="middle" font-size="9" fill="#448265">In Arbeit</text>
+  <path d="M526 516h10" stroke="#a0adbd" stroke-width="1.5"/>
+
+  <rect x="208" y="559" width="343" height="72" rx="7" fill="#fff" stroke="#e3e9f0"/>
+  <text x="222" y="583" font-size="12" font-weight="650">Kampagnen-Setup</text>
+  <text x="222" y="602" class="muted tiny">Morgenrot GmbH · PR-098</text>
+  <rect x="222" y="609" width="62" height="15" rx="7.5" fill="#f1f4f8"/>
+  <text x="253" y="620" text-anchor="middle" font-size="9" fill="#718096">Planung</text>
+  <path d="M526 595h10" stroke="#a0adbd" stroke-width="1.5"/>
+
+  <rect x="208" y="638" width="343" height="72" rx="7" fill="#fff" stroke="#e3e9f0"/>
+  <text x="222" y="662" font-size="12" font-weight="650">Kundenportal</text>
+  <text x="222" y="681" class="muted tiny">Komet Digital · PR-091</text>
+  <rect x="222" y="688" width="79" height="15" rx="7.5" fill="#eaf5ef"/>
+  <text x="261.5" y="699" text-anchor="middle" font-size="9" fill="#448265">Abgeschlossen</text>
+  <path d="M526 674h10" stroke="#a0adbd" stroke-width="1.5"/>
+
+  <!-- Scroll cue -->
+  <rect x="557" y="409" width="3" height="190" rx="1.5" fill="#edf1f5"/>
+  <rect x="557" y="409" width="3" height="74" rx="1.5" fill="#bcc8d6"/>
+  <rect x="192" y="758" width="375" height="72" fill="url(#fade)" opacity=".92"/>
+  <text x="379.5" y="790" text-anchor="middle" class="muted tiny">Liste scrollen · Eintrag antippen, um ihn zu öffnen</text>
+</g>
+
+<!-- screen-edge dimension note -->
+<rect x="602" y="423" width="119" height="66" rx="9" fill="#fff" stroke="#e0e7ef"/>
+<text x="616" y="448" class="blueText tiny" font-weight="700">Viewport</text>
+<text x="616" y="469" font-size="13" font-weight="700">375 × 667 px</text>
+<path d="M602 456H578" stroke="#b8c7d9" stroke-width="1.5"/>
+<text x="602" y="516" class="muted tiny">Suchfeld bleibt</text>
+<text x="602" y="532" class="muted tiny">im Blick.</text>
+</svg>
