@@ -1,42 +1,216 @@
 @page "/"
 @page "/{*Path}"
+@implements IDisposable
+@inject HttpClient Http
+@inject NavigationManager Navigation
 @inject IJSRuntime JS
 
-<div class="app-shell">
-  <header class="topbar">
-    <button class="brand" data-action="home" aria-label="Zur Startseite">
-      <span class="brand-mark" aria-hidden="true"><svg><use href="#i-house"></use></svg></span>
-      <span class="brand-name">Acme</span>
-    </button>
+<div class="app-shell @(IsDataMode ? "data-mode-active" : "")">
+    <header class="topbar">
+        <button class="brand" @onclick="NavigateHome" aria-label="Zur Startseite"><span class="brand-mark"><Icon Name="house" /></span><span class="brand-name">Acme</span></button>
+        <div class="topbar-center">
+            <label class="searchbox" for="global-search"><Icon Name="search" /><input id="global-search" class="@(OnboardingActive && OnboardingIndex == 3 ? "tour-highlight" : "")" @bind="GlobalSearch" @bind:event="oninput" @onkeydown="OnSearchKeyDown" placeholder="Suchen…" autocomplete="off" /><kbd>⌘ K</kbd></label>
+            @if (GlobalSearch.Trim().Length > 0)
+            {
+                <div class="search-results"><div class="search-caption">@(GlobalSearchResults.Count > 0 ? "Bereiche" : "Keine Treffer")</div>
+                    @foreach (var item in GlobalSearchResults) { <button class="search-result" @onclick="() => NavigateToModule(item.Id)"><span class="tile-icon"><Icon Name="@item.Icon" /></span><span><strong>@item.Title</strong><small>@item.Group · @item.Description</small></span></button> }
+                    @if (GlobalSearchResults.Count == 0) { <div class="empty-row">Versuch es mit „Projekte“ oder „Rechnungen“.</div> }
+                </div>
+            }
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-button" @onclick='() => TogglePopover("help")' aria-label="Hilfe" title="Hilfe"><Icon Name="help" /></button>
+            <button class="icon-button notification-button" @onclick='() => TogglePopover("notifications")' aria-label="Benachrichtigungen" title="Benachrichtigungen"><Icon Name="bell" /><span class="notification-dot"></span></button>
+            <button class="avatar-button" @onclick='() => TogglePopover("profile")' aria-label="Profil öffnen" title="Profil"><span>ML</span><i></i></button>
+        </div>
+    </header>
 
-    <div class="topbar-center">
-      <label class="searchbox" for="global-search">
-        <svg aria-hidden="true"><use href="#i-search"></use></svg>
-        <input id="global-search" type="search" placeholder="Suchen…" autocomplete="off" />
-        <kbd>⌘ K</kbd>
-      </label>
-      <div class="search-results" id="search-results" hidden></div>
-    </div>
+    @if (OpenPopover is not null)
+    {
+        <section class="popover">
+            @if (OpenPopover == "notifications")
+            {
+                <div class="popover-header">Benachrichtigungen <span>3 neu</span></div>
+                <div class="popover-item"><Icon Name="check" /><span><strong>Aufgabe fällig heute</strong><br />„Startseite finalisieren“ wartet auf dich.</span></div>
+                <div class="popover-item"><Icon Name="file" /><span><strong>Angebot freigegeben</strong><br />Bergwerk AG hat das Angebot geöffnet.</span></div>
+                <div class="popover-item"><Icon Name="users" /><span><strong>Neuer Kontakt</strong><br />Nordlicht Studio wurde hinzugefügt.</span></div>
+            }
+            else if (OpenPopover == "profile")
+            {
+                <div class="profile-card"><span class="profile-large">ML</span><span><strong>Mia Lehmann</strong><small>mia@acme.studio</small></span></div>
+                <button class="menu-item" @onclick="ToggleTheme"><Icon Name="@(IsDarkMode ? "sun" : "moon")" /> @(IsDarkMode ? "Hellmodus aktivieren" : "Dark Mode aktivieren")</button>
+                <button class="menu-item" @onclick='() => OpenPreferences("Mein Profil")'><Icon Name="users" /> Mein Profil</button>
+                <button class="menu-item" @onclick='() => OpenPreferences("Persönliche Einstellungen")'><Icon Name="settings" /> Persönliche Einstellungen</button>
+                <button class="menu-item" @onclick='() => ShowToast("Du arbeitest bereits in Acme Studio.")'><Icon Name="folder" /> Arbeitsbereich wechseln</button>
+            }
+            else
+            {
+                <div class="popover-header">Wie können wir helfen?</div>
+                <button class="menu-item" @onclick="StartOnboarding"><Icon Name="spark" /> Einführung ansehen</button>
+                <div class="popover-item"><Icon Name="help" /><span><strong>Erste Schritte</strong><br />Erkunde die Bereiche über die Kacheln.</span></div>
+                <div class="popover-item"><Icon Name="file" /><span><strong>Hilfe-Center</strong><br />Tipps und Antworten rund um Acme.</span></div>
+                <button class="menu-item" @onclick='() => ShowToast("Das Support-Team meldet sich bei dir.")'><Icon Name="arrow" /> Support kontaktieren</button>
+            }
+        </section>
+    }
 
-    <div class="topbar-actions">
-      <button class="icon-button" data-action="help" aria-label="Hilfe" title="Hilfe"><svg><use href="#i-help"></use></svg></button>
-      <button class="icon-button notification-button" data-action="notifications" aria-label="Benachrichtigungen" title="Benachrichtigungen"><svg><use href="#i-bell"></use></svg><span class="notification-dot"></span></button>
-      <button class="avatar-button" data-action="profile" aria-label="Profil öffnen" title="Profil"><span>ML</span><i></i></button>
-    </div>
-  </header>
+    <main id="app-main" class="main-content @(IsDataMode ? "data-mode" : "")" tabindex="-1">
+        @if (IsLoading)
+        {
+            <div class="startup">Acme wird geladen…</div>
+        }
+        else if (IsDataMode)
+        {
+            <section class="data-view">
+                <header class="data-toolbar desktop-data-toolbar">
+                    <div class="data-title-block">
+                        <nav class="data-breadcrumbs" aria-label="Datenpfad">
+                            <button class="data-back" @onclick="NavigateHome"><Icon Name="arrow" /> Arbeitsbereiche</button>
+                            @foreach (var crumb in DataPath.Select((entry, index) => (entry, index))) { <Icon Name="arrow" /><button class="data-crumb @(crumb.index == DataPath.Count - 1 ? "active" : "")" @onclick="() => NavigateDataCrumb(crumb.index)">@crumb.entry.Label</button> }
+                        </nav><p class="data-eyebrow">Rohdaten@(IsScopedData ? " · Verknüpfte Einträge" : "")</p><h1>@CurrentDataConfig.Title</h1>
+                    </div>
+                    <div class="data-tools"><label class="data-search"><Icon Name="search" /><input type="search" @bind="DataSearch" @bind:event="oninput" placeholder="Tabelle durchsuchen…" aria-label="@CurrentDataConfig.Title durchsuchen" /></label>
+                        @if (IsScopedData) { <button class="data-add" @onclick="ShowAllData">Alle @CurrentDataConfig.Title.ToLowerInvariant() anzeigen</button> }
+                        else { <button class="data-add" @onclick="AddMasterRow"><Icon Name="plus" /> @CurrentDataConfig.Singular hinzufügen</button> }
+                    </div>
+                </header>
+                <section class="data-sheet-frame desktop-master-table @(OnboardingActive && OnboardingIndex == 1 ? "tour-highlight" : "")" aria-label="@CurrentDataConfig.Title Mastertabelle">
+                    <div class="data-sheet-scroll"><table class="data-sheet"><thead><tr><th class="sheet-index" aria-label="Master auswählen"></th>@foreach (var column in CurrentDataConfig.Columns) { <th>@column.Label</th> }<th class="sheet-actions-heading">Aktionen</th></tr></thead><tbody>
+                    @if (IsEditingMaster && IsNewMaster) { @MasterEditorRow(null, -1) }
+                    @foreach (var row in FilteredMasterRows)
+                    {
+                        var selected = row.Record.Id == SelectedEntityId;
+                        var editing = IsEditingMaster && !IsNewMaster && row.Record.Id == EditingMasterId;
+                        <tr @key="row.Record.Id" class="@MasterRowClass(editing, selected)" aria-selected="@selected" @onclick="() => SelectMaster(row.Record.Id)">
+                            <td class="sheet-index"><button class="sheet-select-button" @onclick:stopPropagation="true" @onclick="() => SelectMaster(row.Record.Id)" aria-label="@Field(row.Record, 0) auswählen">@(row.Index + 1)</button></td>
+                            @foreach (var column in CurrentDataConfig.Columns)
+                            {
+                                var value = Field(row.Record, column.Index);
+                                <td class="@(column.Editable ? "" : "sheet-readonly")" @onclick:stopPropagation="true">
+                                    @if (editing && column.Editable) { @MasterEditor(column) }
+                                    else if (TryGetDirectReference(CurrentDataObject!, row.Record, column.Index, out var reference)) { <button class="data-reference-link" @onclick="() => OpenRelatedAsMaster(reference.ObjectId, reference.EntityId)" aria-label="@value als @GetDataConfig(reference.ObjectId).Singular öffnen">@value</button> }
+                                    else { @value }
+                                </td>
+                            }
+                            <td class="sheet-row-actions" @onclick:stopPropagation="true">
+                                @if (editing) { <button class="sheet-action sheet-action-save" @onclick="SaveMasterEdit">Speichern</button><button class="sheet-action" @onclick="CancelMasterEdit">Abbrechen</button> }
+                                else if (ConfirmDeleteId == row.Record.Id) { <span class="sheet-delete-confirm">Löschen?</span><button class="sheet-action sheet-action-delete" @onclick="() => DeleteEntity(CurrentDataObject!, row.Record.Id)">Ja</button><button class="sheet-action" @onclick="CancelDelete">Nein</button> }
+                                else { <button class="sheet-action" @onclick="() => EditMaster(row.Record)">Bearbeiten</button><button class="sheet-action sheet-action-delete" @onclick="() => AskDelete(row.Record.Id)">Löschen</button> }
+                            </td>
+                        </tr>
+                    }
+                    @if (FilteredMasterRows.Count == 0 && !IsEditingMaster) { <tr><td class="sheet-empty" colspan="@(CurrentDataConfig.Columns.Length + 2)">Keine passenden Datensätze</td></tr> }
+                    </tbody></table></div><footer class="sheet-footer"><span>@FilteredMasterRows.Count Datensätze</span><span class="sheet-hint">Zeile auswählen, Beziehungen unten ansehen</span></footer>
+                </section>
+                <section class="master-detail-panel desktop-master-detail-root" aria-label="Verknüpfte Datensätze">
+                    @if (SelectedMaster is null) { <p class="relations-empty">Wähle einen Masterdatensatz aus, um seine Beziehungen zu sehen.</p> }
+                    else
+                    {
+                        <header class="master-detail-heading"><div><p class="data-eyebrow">TARGET · @CurrentRelationConfig.Title.ToUpperInvariant()</p><h2>@Field(SelectedMaster, 0) <span>· @RelatedRecords.Count</span></h2></div><button class="data-add" @onclick="AddRelatedRow"><Icon Name="plus" /> @CurrentRelationConfig.Singular hinzufügen</button></header>
+                        <div class="relation-tabs @(OnboardingActive && OnboardingIndex == 2 ? "tour-highlight" : "")" role="tablist" aria-label="Beziehungstypen">
+                            @foreach (var objectId in CurrentRelationObjectIds) { var active = objectId == ActiveRelationObject; <button role="tab" aria-selected="@active" class="relation-tab @(active ? "active" : "")" @onclick="() => SelectRelationTab(objectId)">@GetDataConfig(objectId).Title <span>@GetRelatedRecords(objectId).Count</span></button> }
+                        </div>
+                        <div class="relation-sheet-frame"><div class="data-sheet-scroll"><table class="data-sheet relation-sheet"><thead><tr>@foreach (var column in CurrentRelationConfig.Columns) { <th>@column.Label</th> }<th class="relation-actions-heading">Aktionen</th></tr></thead><tbody>
+                            @if (IsEditingRelation && IsNewRelation) { @RelationEditorRow(null) }
+                            @foreach (var row in RelatedRecords)
+                            {
+                                var editing = IsEditingRelation && !IsNewRelation && row.Record.Id == EditingRelationId;
+                                <tr @key="row.Record.Id" class="@(editing ? "sheet-editing" : "")">
+                                    @foreach (var column in CurrentRelationConfig.Columns)
+                                    {
+                                        var value = Field(row.Record, column.Index);
+                                        <td class="@(column.Editable ? "" : "sheet-readonly")">
+                                            @if (editing && column.Editable) { @RelationEditor(column) }
+                                            else if (TryGetDirectReference(ActiveRelationObject!, row.Record, column.Index, out var reference)) { <button class="data-reference-link" @onclick="() => OpenRelatedAsMaster(reference.ObjectId, reference.EntityId)">@value</button> }
+                                            else { @value }
+                                        </td>
+                                    }
+                                    <td class="relation-row-actions">
+                                        @if (editing) { <button class="sheet-action sheet-action-save" @onclick="SaveRelationEdit">Speichern</button><button class="sheet-action" @onclick="CancelRelationEdit">Abbrechen</button> }
+                                        else if (ConfirmDeleteId == row.Record.Id) { <span class="sheet-delete-confirm">Löschen?</span><button class="sheet-action sheet-action-delete" @onclick="() => DeleteEntity(ActiveRelationObject!, row.Record.Id)">Ja</button><button class="sheet-action" @onclick="CancelDelete">Nein</button> }
+                                        else { <button class="sheet-action" @onclick="() => OpenRelatedAsMaster(ActiveRelationObject!, row.Record.Id)">Als Master öffnen</button><button class="sheet-action" @onclick="() => EditRelation(row.Record)">Bearbeiten</button><button class="sheet-action sheet-action-delete" @onclick="() => AskDelete(row.Record.Id)">Löschen</button> }
+                                    </td>
+                                </tr>
+                            }
+                            @if (RelatedRecords.Count == 0 && !IsEditingRelation) { <tr><td class="sheet-empty" colspan="@(CurrentRelationConfig.Columns.Length + 1)">Keine verknüpften Datensätze</td></tr> }
+                        </tbody></table></div><footer class="sheet-footer"><span>@RelatedRecords.Count @CurrentRelationConfig.Title.ToLowerInvariant()</span><span class="sheet-hint">Bearbeiten, löschen oder als nächsten Master öffnen</span></footer></div>
+                    }
+                </section>
+                <section class="mobile-master-detail-root">
+                    @if (MobilePickerReturn || SelectedMaster is null)
+                    {
+                        <div class="mobile-picker-view"><header class="mobile-picker-header"><button class="mobile-data-back" @onclick="NavigateHome"><Icon Name="arrow" /> Arbeitsbereiche</button><p>ROHDATEN · MASTER AUSWÄHLEN</p><h1>@CurrentDataConfig.Title</h1><span class="mobile-picker-intro">Wähle einen Datensatz, um Details und verknüpfte Daten zu sehen.</span><label class="mobile-picker-search"><Icon Name="search" /><input @bind="DataSearch" @bind:event="oninput" placeholder="@CurrentDataConfig.Singular suchen…" /></label><div class="mobile-picker-meta"><span>@FilteredMasterRows.Count Datensätze</span><strong>Antippen zum Öffnen</strong></div><button class="mobile-open-master" @onclick="AddMobileMaster"><Icon Name="plus" /> @CurrentDataConfig.Singular hinzufügen</button></header>
+                            <div class="mobile-picker-results">@foreach (var row in FilteredMasterRows) { <button class="mobile-picker-result @(row.Record.Id == SelectedEntityId ? "selected" : "")" @onclick="() => SelectMobileMaster(row.Record.Id)"><span class="mobile-picker-result-copy"><strong>@Field(row.Record, 0)</strong><span>@Field(row.Record, 1) · @Field(row.Record, 2)</span><small class="status @StatusClass(Field(row.Record, 3))">@Field(row.Record, 3)</small></span><span class="mobile-picker-check"><Icon Name="check" /></span></button> }</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <header class="mobile-data-header"><button class="mobile-data-back" @onclick="BackToMobileMasterList"><Icon Name="arrow" /> Alle @CurrentDataConfig.Title.ToLowerInvariant()</button><p>ROHDATEN · MASTER-DETAIL</p><h1>@CurrentDataConfig.Title</h1></header>
+                        <MobileDataCard Record="SelectedMaster" ObjectId="CurrentDataObject!" Config="CurrentDataConfig" IsMaster="true" IsNew="IsMobileNew(SelectedMaster)" ConfirmDelete="ConfirmDeleteId == SelectedMaster.Id" DraftFields="GetMobileFields(CurrentDataObject!, SelectedMaster)" RelatedObjectIds="CurrentRelationObjectIds" Relations="State.Relations" AllRecords="State.Modules" OnFieldChanged="OnMobileFieldChanged" OnOpenReference="OnOpenMobileReference" OnOpenMaster="OnOpenMobileMaster" OnBack="BackToMobileMasterList" OnDelete="() => AskDelete(SelectedMaster.Id)" OnConfirmDelete="() => DeleteEntity(CurrentDataObject!, SelectedMaster.Id)" OnCancelDelete="CancelDelete" />
+                        <section class="mobile-target-section"><h2>Verknüpfte Daten</h2><div class="mobile-relation-tabs" role="tablist" aria-label="Beziehungstypen">@foreach (var objectId in CurrentRelationObjectIds) { var active = objectId == ActiveRelationObject; <button role="tab" class="relation-tab @(active ? "active" : "")" aria-selected="@active" @onclick="() => SelectRelationTab(objectId)">@GetDataConfig(objectId).Title <span>@GetRelatedRecords(objectId).Count</span></button> }</div>
+                            <button class="mobile-open-master" @onclick="() => CreateMobileRelated(ActiveRelationObject!)"><Icon Name="plus" /> @CurrentRelationConfig.Singular hinzufügen</button>
+                            @if (RelatedRecords.Count == 0) { <div class="mobile-empty-state"><p>Keine @CurrentRelationConfig.Title.ToLowerInvariant() verknüpft.</p></div> }
+                            @foreach (var row in RelatedRecords) { <MobileDataCard @key="row.Record.Id" Record="row.Record" ObjectId="ActiveRelationObject!" Config="CurrentRelationConfig" IsMaster="false" IsNew="IsMobileNew(row.Record)" ConfirmDelete="ConfirmDeleteId == row.Record.Id" DraftFields="GetMobileFields(ActiveRelationObject!, row.Record)" RelatedObjectIds="GetRelationObjectIds(ActiveRelationObject!)" Relations="State.Relations" AllRecords="State.Modules" OnFieldChanged="OnMobileFieldChanged" OnOpenReference="OnOpenMobileReference" OnOpenMaster="OnOpenMobileMaster" OnBack="BackToMobileMasterList" OnDelete="() => AskDelete(row.Record.Id)" OnConfirmDelete="() => DeleteEntity(ActiveRelationObject!, row.Record.Id)" OnCancelDelete="CancelDelete" /> }
+                        </section>
+                        @if (MobileDrafts.Count > 0) { <div class="mobile-savebar"><div class="mobile-save-status">Änderungen werden hier gesammelt</div><button class="mobile-save-button" @onclick="SaveMobileDrafts">Änderungen speichern</button></div> }
+                    }
+                </section>
+            </section>
+        }
+        else if (CurrentModule is null)
+        {
+            <section class="welcome-row"><div><h1>Arbeitsbereiche</h1><p class="welcome-copy">Wähle einen Bereich, um loszulegen.</p></div><div class="workspace-select"><span class="workspace-avatar">A</span><span>Arbeitsbereich</span><strong>Acme Studio</strong><Icon Name="more" /></div></section>
+            <div class="section-stack">@foreach (var group in Groups) { <section class="category-card"><h2 class="category-heading">@group.Title</h2><p class="category-subtitle">@group.Subtitle</p><div class="tile-grid">@foreach (var item in group.Modules) { <button class="nav-tile @(group.IsData ? "nav-tile-data" : "") @(OnboardingActive && OnboardingIndex == 0 && group.IsData ? "tour-highlight" : "")" @onclick="() => NavigateFromGroup(group, item)" aria-label="@(group.IsData ? $"{item.Title} Rohdaten öffnen" : $"{item.Title} öffnen")"><span class="tile-icon"><Icon Name="@item.Icon" /></span><span class="tile-copy"><span class="tile-title">@item.Title</span><span class="tile-desc">@(group.IsData ? "Rohdaten-Tabelle" : item.Description)</span></span><Icon Name="arrow" Class="tile-arrow" /></button> }</div></section> }</div>
+            <footer class="home-footer"><span class="tip"><Icon Name="spark" /> Tipp: Nutze die Suche, um direkt zu einem Bereich zu springen.</span><button class="text-button" @onclick="ShowShortcuts">Tastenkürzel anzeigen <Icon Name="arrow" /></button></footer>
+        }
+        else
+        {
+            var item = CurrentModule;
+            <nav class="breadcrumbs" aria-label="Brotkrumennavigation"><button @onclick="NavigateHome">Arbeitsbereich</button><Icon Name="arrow" /><span>@item.Group</span><Icon Name="arrow" /><strong>@item.Title</strong></nav>
+            <section class="module-header"><div class="module-title-wrap"><span class="module-icon"><Icon Name="@item.Icon" /></span><div><p class="eyebrow">@item.Group</p><h1>@item.Title</h1><p>@item.Subtitle · Zuletzt aktualisiert vor wenigen Minuten</p></div></div><button class="primary-button" @onclick="OpenCreateModal"><Icon Name="plus" />@item.Action</button></section>
+            <section class="stats-row" aria-label="Kennzahlen">
+                @for (var i = 0; i < item.Stats.Length; i++) { <article class="stat-card"><div class="stat-label">@item.StatLabels[i]</div><div class="stat-value-row"><strong class="stat-value">@item.Stats[i]</strong><span class="stat-icon"><Icon Name="@(i == 0 ? item.Icon : i == 1 ? "trend" : i == 2 ? "chart" : "check")" /></span></div><div class="stat-change">@(i == 0 ? "↗ 8,4 %" : i == 1 ? "im Vergleich zum Vormonat" : i == 2 ? "Aktualisiert heute" : "im aktuellen Zeitraum")</div></article> }
+            </section>
+            <section class="content-card">
+                <header class="content-card-header"><div><h2>@(item.Id == "aufgaben" ? "Aufgaben für dein Team" : $"Alle {item.Title.ToLowerInvariant()}")</h2><p>Bleib auf dem Laufenden und verwalte deine @item.Title.ToLowerInvariant().</p></div><div class="table-tools"><label class="table-search"><Icon Name="search" /><input type="search" @bind="ModuleSearch" @bind:event="oninput" placeholder="In @item.Title.ToLowerInvariant() suchen…" aria-label="Tabelle durchsuchen" /></label><button class="filter-button" @onclick="ToggleOpenFilter"><Icon Name="filter" /> @(OnlyOpen ? "Alle anzeigen" : "Filter")</button></div></header>
+                <div class="table-wrap"><table><colgroup><col class="col-name" /><col class="col-owner" /><col class="col-status" /><col class="col-updated" /><col class="col-value" /><col class="col-actions" /></colgroup><thead><tr><th>@ModulePrimaryLabel(item)</th><th>Verantwortlich</th><th>Status</th><th>Aktualisiert</th><th>@(item.Id == "aufgaben" ? "Priorität" : item.Id == "zeiterfassung" ? "Erfasste Zeit" : "Wert")</th><th></th></tr></thead><tbody>
+                    @foreach (var record in FilteredModuleRows) { <tr @onclick="() => OpenDetail(record)"><td><div class="row-name"><span class="row-avatar @AvatarTone(record.Id)">@Initials(Field(record, 0))</span><span>@Field(record, 0)<small class="row-sub">@Field(record, 1)</small></span></div></td><td>@Field(record, 2)</td><td><span class="status @StatusClass(Field(record, 3))">@Field(record, 3)</span></td><td>@Field(record, 4)</td><td class="amount">@Field(record, 5)</td><td><button class="row-menu" @onclick:stopPropagation="true" @onclick='() => ShowToast("Weitere Optionen folgen in dieser Demo.")' aria-label="Optionen für @Field(record, 0)"><Icon Name="more" /></button></td></tr> }
+                    @if (FilteredModuleRows.Count == 0) { <tr><td colspan="6"><div class="empty-row">Keine passenden Einträge gefunden.</div></td></tr> }
+                </tbody></table></div>
+                <footer class="table-footer"><span>@FilteredModuleRows.Count Einträge</span><div class="pagination"><span>Seite</span><button class="page-button active" @onclick='() => ShowToast("Seite 1 geladen.")'>1</button><button class="page-button" @onclick='() => ShowToast("Seite 2 geladen.")'>2</button><button class="page-button" @onclick='() => ShowToast("Seite 3 geladen.")'>3</button><Icon Name="arrow" /></div></footer>
+            </section>
+            <div class="secondary-grid"><section class="content-card"><header class="content-card-header"><div><h2>Letzte Aktivitäten</h2><p>Was in diesem Bereich passiert ist</p></div><button class="text-button" @onclick='() => ShowToast("Alle Aktivitäten sind in dieser Übersicht sichtbar.")'>Alle ansehen <Icon Name="arrow" /></button></header><div class="activity-list">@foreach (var activity in item.Activities.Select((text, index) => (text, index))) { <div class="activity-item"><span class="activity-dot"></span><span>@activity.text</span><span class="activity-time">@(activity.index == 0 ? "Vor 12 Min." : activity.index == 1 ? "Vor 1 Std." : "Gestern")</span></div> }</div></section><section class="content-card"><header class="content-card-header"><div><h2>Bereichsfortschritt</h2><p>Dein Team ist gut unterwegs</p></div><button class="row-menu" @onclick='() => ShowToast("Fortschritt wird automatisch aktualisiert.")' aria-label="Optionen"><Icon Name="more" /></button></header><div class="progress-content"><div class="progress-title"><span>Monatsziel</span><strong>72 %</strong></div><div class="progress-track"><span></span></div><p class="progress-caption">Noch 8 Tage bis zum Monatsende</p></div></section></div>
+        }
+    </main>
 
-  <main id="app-main" class="main-content" tabindex="-1"></main>
-  <div id="overlay-root"></div>
-  <div id="onboarding-root"></div>
-  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+    @if (ModalKind is not null)
+    {
+        <div class="overlay" @onclick="CloseModal">
+            <section class="modal" @onclick:stopPropagation="true">
+                <header class="modal-header"><div><h2>@ModalTitle</h2><p>@ModalSubtitle</p></div><button class="close-button" @onclick="CloseModal" aria-label="Schließen"><Icon Name="plus" /></button></header>
+                @if (ModalKind == "create")
+                {
+                    <div class="form-body"><div class="field"><label>Name</label><input @bind="CreateFields[0]" placeholder="Neuer Eintrag" /></div><div class="field"><label>@(CurrentModule?.Id == "kunden" ? "Branche" : "Kunde oder Projekt")</label><input @bind="CreateFields[1]" placeholder="z. B. Nordlicht Studio" /></div><div class="field"><label>Verantwortlich</label><select @bind="CreateFields[2]">@foreach (var person in People) { <option>@person</option> }</select></div><div class="field"><label>Status</label><select @bind="CreateFields[3]">@foreach (var status in CreateStatuses) { <option>@status</option> }</select></div><div class="field"><label>Notiz <span>(optional)</span></label><textarea @bind="CreateNote" placeholder="Ergänze eine kurze Notiz…"></textarea></div></div><footer class="modal-footer"><button class="secondary-button" @onclick="CloseModal">Abbrechen</button><button class="primary-button" @onclick="SaveCreate"><Icon Name="check" /> Eintrag speichern</button></footer>
+                }
+                else if (ModalKind == "detail" && DetailRecord is not null)
+                {
+                    <div class="form-body"><div class="field"><label>Bezug / Details</label><div>@Field(DetailRecord, 1)</div></div><div class="field"><label>Verantwortlich</label><div>@Field(DetailRecord, 2)</div></div><div class="field"><label>Status</label><div><span class="status @StatusClass(Field(DetailRecord, 3))">@Field(DetailRecord, 3)</span></div></div><div class="field"><label>Zuletzt aktualisiert</label><div>@Field(DetailRecord, 4)</div></div><div class="field"><label>Wert / Details</label><div>@Field(DetailRecord, 5)</div></div><p class="welcome-copy">Dieser Eintrag gehört zu <strong>@CurrentModule?.Title</strong>. Hier kannst du Details ansehen und weiterarbeiten.</p></div><footer class="modal-footer"><button class="secondary-button" @onclick="CloseModal">Schließen</button><button class="primary-button" @onclick='() => ShowToast("Bearbeiten ist für den nächsten Schritt vorgemerkt.")'><Icon Name="file" /> Bearbeiten</button></footer>
+                }
+                else if (ModalKind is "preferences" or "account")
+                {
+                    <div class="form-body"><div class="field"><label>Name</label><input @bind="PreferenceName" /></div><div class="field"><label>E-Mail-Adresse</label><input type="email" @bind="PreferenceEmail" /></div><div class="field"><label>E-Mail-Benachrichtigungen</label><select @bind="PreferenceNotifications"><option>Wichtige Updates</option><option>Alle Aktivitäten</option><option>Keine E-Mails</option></select></div></div><footer class="modal-footer"><button class="secondary-button" @onclick="CloseModal">Abbrechen</button><button class="primary-button" @onclick="SavePreferences"><Icon Name="check" /> Speichern</button></footer>
+                }
+                else
+                {
+                    <div class="form-body"><div class="progress-title"><span>Suche öffnen</span><kbd>Ctrl / ⌘ + K</kbd></div><div class="progress-title"><span>Zur Startseite</span><kbd>Esc</kbd></div><div class="progress-title"><span>Bereich öffnen</span><kbd>Enter</kbd></div></div><footer class="modal-footer"><button class="primary-button" @onclick="CloseModal">Verstanden</button></footer>
+                }
+            </section>
+        </div>
+    }
+    @if (OnboardingActive)
+    {
+        <div id="onboarding-root"><section class="tour-card" data-placement="bottom" style="right:16px;bottom:16px"><div class="tour-card-top"><span class="tour-label"><Icon Name="spark" /> Einführung</span><button class="tour-close" @onclick="SkipOnboarding" aria-label="Einführung schließen"><Icon Name="plus" /></button></div><div class="tour-progress"><span>@(OnboardingIndex + 1) / @OnboardingSteps.Count</span><div><i style="width:@($"{(OnboardingIndex + 1) * 100 / OnboardingSteps.Count}%")"></i></div></div><h2>@OnboardingSteps[OnboardingIndex].Title</h2><p>@OnboardingSteps[OnboardingIndex].Copy</p><div class="tour-actions"><button class="tour-skip" @onclick="SkipOnboarding">Überspringen</button><div><button class="secondary-button" disabled="@(OnboardingIndex == 0)" @onclick="PreviousOnboarding">Zurück</button><button class="primary-button" @onclick="NextOnboarding">@(OnboardingIndex == OnboardingSteps.Count - 1 ? "Fertig" : "Weiter")</button></div></div></section></div>
+    }
+    @if (!string.IsNullOrWhiteSpace(ToastMessage)) { <div class="toast-root" aria-live="polite"><div class="toast"><Icon Name="check" /><span>@ToastMessage</span></div></div> }
 </div>
 
-@code {
-  [Parameter] public string? Path { get; set; }
-
-  protected override async Task OnAfterRenderAsync(bool firstRender)
-  {
-    if (firstRender)
-      await JS.InvokeVoidAsync("acmePrototype.start");
-  }
-}

@@ -1,0 +1,119 @@
+<article class="mobile-record-card @(IsMaster ? "mobile-master-card" : "mobile-target-card")">
+    <header class="mobile-record-heading">
+        <div><p>@(IsMaster ? "MASTER" : "TARGET") · @Config.Singular.ToUpperInvariant()</p><strong class="mobile-record-title">@GetValue(0)</strong></div>
+        @if (IsMaster)
+        {
+            <button class="mobile-inline-action" @onclick="OnBack">Alle @Config.Title.ToLowerInvariant()</button>
+        }
+        else
+        {
+            <button class="mobile-inline-action" @onclick="OpenMaster">Als Master öffnen</button>
+        }
+    </header>
+    <div class="mobile-card-actions">
+        @if (ConfirmDelete)
+        {
+            <span class="sheet-delete-confirm">Datensatz löschen?</span>
+            <button @onclick="OnConfirmDelete">Ja, löschen</button>
+            <button @onclick="OnCancelDelete">Abbrechen</button>
+        }
+        else
+        {
+            @if (IsMaster && IsNew) { <span>Neuer Datensatz</span> }
+            @if (!IsMaster && IsNew) { <span>Neuer verknüpfter Datensatz</span> }
+            <button class="mobile-delete" @onclick="OnDelete">Löschen</button>
+        }
+    </div>
+    <div class="mobile-record-fields">
+        @foreach (var column in Config.Columns)
+        {
+            var value = GetValue(column.Index);
+            var reference = FindReference(column.Index);
+            <div class="mobile-field-row">
+                <span>@column.Label</span>
+                <div class="mobile-reference-control">
+                    @if (column.Type == "select" && column.Editable)
+                    {
+                        <select class="mobile-record-field" value="@value" @onchange="args => Change(column.Index, args.Value?.ToString())" aria-label="@column.Label">
+                            @foreach (var status in Config.Statuses.Append(value).Where(item => !string.IsNullOrWhiteSpace(item)).Distinct()) { <option value="@status">@status</option> }
+                        </select>
+                    }
+                    else
+                    {
+                        <input class="mobile-record-field @(column.Editable ? "" : "readonly")" value="@value" readonly="@(!column.Editable)" @oninput="args => Change(column.Index, args.Value?.ToString())" aria-label="@column.Label" />
+                    }
+                    @if (reference is not null)
+                    {
+                        <button type="button" class="mobile-reference-link" @onclick="() => OnOpenReference.InvokeAsync(reference)" aria-label="@GetValue(column.Index) als @FindConfig(reference.ObjectId).Singular öffnen"><Icon Name="arrow" /></button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</article>
+
+@code {
+    [Parameter, EditorRequired] public PrototypeRecordDto Record { get; set; } = new();
+    [Parameter, EditorRequired] public string ObjectId { get; set; } = "";
+    [Parameter, EditorRequired] public DataTableConfig Config { get; set; } = new("", "", [], []);
+    [Parameter] public bool IsMaster { get; set; }
+    [Parameter] public bool IsNew { get; set; }
+    [Parameter] public bool ConfirmDelete { get; set; }
+    [Parameter] public List<string> DraftFields { get; set; } = [];
+    [Parameter] public IReadOnlyList<string> RelatedObjectIds { get; set; } = [];
+    [Parameter] public List<PrototypeRelationDto> Relations { get; set; } = [];
+    [Parameter] public Dictionary<string, List<PrototypeRecordDto>> AllRecords { get; set; } = new();
+    [Parameter] public EventCallback<MobileFieldChange> OnFieldChanged { get; set; }
+    [Parameter] public EventCallback<EntityReference> OnOpenReference { get; set; }
+    [Parameter] public EventCallback<(string ObjectId, string EntityId)> OnOpenMaster { get; set; }
+    [Parameter] public EventCallback OnBack { get; set; }
+    [Parameter] public EventCallback OnDelete { get; set; }
+    [Parameter] public EventCallback OnConfirmDelete { get; set; }
+    [Parameter] public EventCallback OnCancelDelete { get; set; }
+
+    private string GetValue(int index) => DraftFields.ElementAtOrDefault(index) ?? Record.Fields.ElementAtOrDefault(index) ?? "";
+    private Task Change(int index, string? value) => OnFieldChanged.InvokeAsync(new(ObjectId, Record.Id, index, value));
+    private Task OpenMaster() => OnOpenMaster.InvokeAsync((ObjectId, Record.Id));
+
+    private EntityReference? FindReference(int index)
+    {
+        var targetObject = ReferenceTarget(ObjectId, index);
+        if (targetObject is null) return null;
+        foreach (var relation in Relations)
+        {
+            if (relation.From.Object == ObjectId && relation.From.Id == Record.Id && relation.To.Object == targetObject)
+                return new(targetObject, relation.To.Id);
+            if (relation.To.Object == ObjectId && relation.To.Id == Record.Id && relation.From.Object == targetObject)
+                return new(targetObject, relation.From.Id);
+        }
+        var text = GetValue(index);
+        var candidate = FindRecords(targetObject).FirstOrDefault(row => text.Equals(row.Fields.ElementAtOrDefault(0), StringComparison.OrdinalIgnoreCase)
+            || text.StartsWith((row.Fields.ElementAtOrDefault(0) ?? "") + " ·", StringComparison.OrdinalIgnoreCase)
+            || text.Contains(row.Fields.ElementAtOrDefault(0) ?? "\0", StringComparison.OrdinalIgnoreCase));
+        return candidate is null ? null : new(targetObject, candidate.Id);
+    }
+
+    private DataTableConfig FindConfig(string objectId)
+    {
+        if (objectId == "kunden") return new("Kunden", "Kunde", [], []);
+        if (objectId == "projekte") return new("Projekte", "Projekt", [], []);
+        return new(objectId, objectId, [], []);
+    }
+
+    private List<PrototypeRecordDto> FindRecords(string objectId)
+    {
+        var key = AllRecords.Keys.FirstOrDefault(item => item.Equals(objectId, StringComparison.OrdinalIgnoreCase));
+        return key is null ? [] : AllRecords[key];
+    }
+
+    private static string? ReferenceTarget(string objectId, int column)
+    {
+        if (column == 2 && objectId != "ressourcen") return "ressourcen";
+        return (objectId, column) switch
+        {
+            ("projekte", 1) or ("angebote", 1) or ("vertraege", 1) or ("aktivitaeten", 1) or ("rechnungen", 1) => "kunden",
+            ("aufgaben", 1) or ("zeiterfassung", 0) => "projekte",
+            _ => null
+        };
+    }
+}

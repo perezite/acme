@@ -45,6 +45,8 @@
 
 * { box-sizing: border-box; }
 body { min-width: 320px; min-height: 100vh; margin: 0; background: radial-gradient(ellipse at 50% -180px, #eaf3ff 0, #f5f8fc 58%); }
+#blazor-error-ui { display: none; position: fixed; inset-inline: 0; bottom: 0; z-index: 1000; padding: 12px 20px; border-top: 1px solid #f0c7c4; background: #fff2f1; color: #7a2520; box-shadow: 0 -4px 18px rgba(39, 52, 73, .12); }
+#blazor-error-ui .reload { margin-left: 6px; color: #9b3029; font-weight: 600; }
 button, input, select, textarea { font: inherit; }
 button { color: inherit; }
 .icon-definitions { position: absolute; width: 0; height: 0; overflow: hidden; }
@@ -196,7 +198,7 @@ h1 { font-size: var(--type-page); }
 
 /* Compact scale: five sizes cover the complete interface. */
 .brand-name { font-size: var(--type-heading); }
-.workspace-avatar, .popover-header span, #overlay-root .welcome-copy { font-size: var(--type-caption) !important; }
+.workspace-avatar, .popover-header span, .modal .welcome-copy { font-size: var(--type-caption) !important; }
 @media (max-width: 560px) {
   .brand-name { font-size: var(--type-heading); }
 }
@@ -677,9 +679,9 @@ button, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 :root[data-theme="dark"] .sheet-selected .sheet-select-button { background: #28394e; color: #a8c7e9; }
 
 @media (max-width: 700px) {
-  body.data-mode-active .topbar { position: sticky; top: 0; z-index: 8; height: 60px; grid-template-columns: 1fr auto; grid-template-rows: 1fr; gap: 8px; padding: 0 12px; }
-  body.data-mode-active .topbar-center { display: none; }
-  body.data-mode-active .topbar-actions { grid-column: 2; grid-row: 1; }
+  .app-shell.data-mode-active .topbar { position: sticky; top: 0; z-index: 8; height: 60px; grid-template-columns: 1fr auto; grid-template-rows: 1fr; gap: 8px; padding: 0 12px; }
+  .app-shell.data-mode-active .topbar-center { display: none; }
+  .app-shell.data-mode-active .topbar-actions { grid-column: 2; grid-row: 1; }
   .main-content.data-mode { max-width: none; padding: 0 0 0; }
   .data-view { gap: 0; }
   .desktop-data-toolbar, .desktop-master-table, .desktop-master-detail-root { display: none; }

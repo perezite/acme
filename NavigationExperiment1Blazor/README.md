@@ -2,7 +2,7 @@
 
 Ein Blazor-WebAssembly-Frontend mit ASP.NET-Core-API und SQLite-Datenbank. Die Oberfläche übernimmt den HTML-Prototyp mit kategorisierten Kacheln, Suche, Onboarding, Dark Mode sowie der Rohdatenansicht mit Master-Detail-Navigation für Desktop und Mobile.
 
-Die vorhandene HTML/CSS/JavaScript-Oberfläche läuft im Blazor-WebAssembly-Host, damit Verhalten und Gestaltung des Prototyps erhalten bleiben. Die Daten werden über die ASP.NET-Core-API und EF Core gespeichert.
+Die Oberfläche und Anwendungslogik sind als Blazor-Komponenten und C# implementiert. JavaScript wird nur als schmale Browser-Brücke für lokale Darstellungspräferenzen und globale Tastaturereignisse verwendet. Die Daten werden über die ASP.NET-Core-API und EF Core gespeichert.
 
 ## Start in Visual Studio
 
