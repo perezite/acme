@@ -17,7 +17,7 @@ Eigenständiger HTML-Prototyp mit einem Screen, möglichst nah an den gelieferte
 
 ## Layout
 
-Die Referenzfläche ist **1920 × 1080 CSS-Pixel** bei 100 % Browser-Zoom. In dieser Grösse werden die Kachelpositionen und Proportionen aus den Mockups nachgebildet, inklusive der bewusst versetzten Anordnung und der Untertitel.
+Die Referenzfläche ist **1920 × 1080 CSS-Pixel** bei 100 % Browser-Zoom. Die Kacheln folgen einem unsichtbaren Raster aus acht gleich breiten Spalten: schmale Kacheln belegen eine Spalte, breite Kacheln zwei. Alle Kacheln sind 136px hoch und haben horizontal wie vertikal 16px Abstand. Die versetzte Anordnung und die Untertitel bleiben erhalten; die Kanten sind auf gemeinsame Fluchten ausgerichtet.
 
 Ab 1200px Fensterbreite wird die Referenzfläche proportional an die verfügbare Breite angepasst, maximal bis zur Originalgrösse. Bei geringer Fensterhöhe kann die Seite vertikal gescrollt werden. Dadurch bleibt die Schrift lesbar.
 

@@ -25,7 +25,7 @@
   --purple-top: #e1cafb;
   --purple-bottom: #d4b7f6;
   --icon-ink: #0a132b;
-  --shadow: 0 2px 4px rgb(46 78 113 / 3%);
+  --shadow: 0 2px 4px rgb(30 50 80 / 4%), 0 6px 14px rgb(30 50 80 / 6%);
   --panel-shadow: 0 12px 40px rgb(20 43 72 / 16%);
   --stage-scale: 1;
 }
@@ -48,7 +48,7 @@
   --mint-bottom: #a5f7cc;
   --purple-top: #e6cefc;
   --purple-bottom: #d9bdf5;
-  --shadow: 0 2px 4px rgb(0 0 0 / 10%);
+  --shadow: 0 2px 4px rgb(0 0 0 / 12%), 0 6px 14px rgb(0 0 0 / 16%);
   --panel-shadow: 0 12px 40px rgb(0 0 0 / 30%);
 }
 
@@ -102,19 +102,24 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
 .welcome h1 { margin: 0; font-size: 58px; line-height: 1.08; font-weight: 800; letter-spacing: -.5px; }
 .welcome p { margin: 7px 0 0; color: var(--secondary); font-size: 32px; line-height: 1.35; letter-spacing: -.6px; }
 
-.tile-layout { position: absolute; inset: 0; pointer-events: none; }
+.tile-layout {
+  position: absolute; top: 268px; left: 86px; right: 86px;
+  display: grid; grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-rows: repeat(5, 136px); gap: 16px;
+  pointer-events: none;
+}
 .tile {
-  position: absolute;
-  left: var(--x); top: var(--y); width: var(--width); height: var(--height);
+  position: relative; min-width: 0;
+  grid-column: var(--column) / span var(--span); grid-row: var(--row);
   display: flex; align-items: center; justify-content: flex-start;
-  gap: var(--icon-gap, 24px); padding: 14px 16px 14px var(--inset, 30px);
+  gap: 20px; padding: 14px 12px 14px 24px;
   border: 1.5px solid var(--border); border-radius: 17px;
   background: linear-gradient(130deg, var(--tile), var(--tile-bottom));
   box-shadow: var(--shadow), inset 0 0 0 1px rgb(255 255 255 / 20%);
   color: var(--text); text-align: left; pointer-events: auto;
   transition: border-color 140ms ease, box-shadow 140ms ease, opacity 140ms ease, filter 140ms ease;
 }
-.tile[aria-pressed='true'] { border-color: var(--selected); box-shadow: inset 0 0 0 1.5px var(--selected), 0 0 0 1px var(--selected); }
+.tile[aria-pressed='true'] { border-color: var(--selected); box-shadow: var(--shadow), inset 0 0 0 1.5px var(--selected), 0 0 0 1px var(--selected); }
 .tile:hover { border-color: var(--selected); filter: brightness(1.015); }
 .tile-icon { display: grid; place-items: center; flex: none; width: 78px; height: 76px; border-radius: 16px; background: linear-gradient(135deg, var(--mint-top), var(--mint-bottom)); color: var(--icon-ink); }
 .tile-icon svg { width: 49px; height: 49px; stroke-width: 1.65; }
@@ -122,7 +127,6 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
 .tile-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .tile-title { display: block; font-size: 30px; line-height: 1.16; font-weight: 800; letter-spacing: -1px; white-space: nowrap; }
 .tile-description { display: block; font-size: 18px; line-height: 1.35; font-weight: 400; letter-spacing: -.45px; white-space: nowrap; }
-@media (min-width: 1200px) { .tile[data-tile-id='finanzen'] .tile-description { font-size: 17px; } }
 .tile--narrow { flex-direction: column; justify-content: center; gap: 4px; padding: 7px 8px 10px; text-align: center; }
 .tile--narrow .tile-icon { width: 64px; height: 54px; border-radius: 15px; }
 .tile--narrow .tile-icon svg { width: 40px; height: 40px; }
@@ -131,7 +135,6 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
 .tile--narrow .tile-description { font-size: 17px; line-height: 1.35; letter-spacing: -.55px; }
 .tile.is-dimmed { opacity: .18; filter: grayscale(.35); }
 .tile.is-dimmed:hover { opacity: .55; }
-.page-footer { position: absolute; right: 44px; bottom: 27px; font-size: 20px; line-height: 1.4; letter-spacing: -.4px; }
 .empty-search { position: absolute; left: 110px; top: 228px; margin: 0; color: var(--secondary); font-size: 19px; }
 
 .header-panel { position: absolute; top: 84px; z-index: 10; width: 370px; padding: 25px; border: 1px solid var(--border); border-radius: 16px; background: var(--tile); box-shadow: var(--panel-shadow); }
@@ -173,8 +176,8 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
   .welcome { position: static; }
   .welcome h1 { font-size: 40px; letter-spacing: -1.2px; }
   .welcome p { margin-top: 6px; font-size: 23px; letter-spacing: -.5px; }
-  .tile-layout { position: static; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-flow: dense; gap: 16px; margin-top: 30px; }
-  .tile { position: relative; inset: auto; width: auto; height: auto; min-height: 132px; grid-column: span 2; gap: 20px; padding: 18px 25px; border-radius: 14px; }
+  .tile-layout { position: static; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: minmax(144px, auto); grid-auto-flow: dense; margin-top: 30px; }
+  .tile { min-height: 132px; grid-column: span 2; grid-row: auto; gap: 20px; padding: 18px 25px; border-radius: 14px; }
   .tile-icon { width: 65px; height: 65px; border-radius: 14px; }
   .tile-icon svg { width: 43px; height: 43px; }
   .tile-title { font-size: 26px; letter-spacing: -.8px; }
@@ -182,7 +185,6 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
   .tile--narrow { grid-column: span 1; min-height: 142px; gap: 6px; padding: 12px 9px; }
   .tile--narrow .tile-title { font-size: 22px; letter-spacing: -.7px; }
   .tile--narrow .tile-description { font-size: 15px; white-space: normal; letter-spacing: -.35px; }
-  .page-footer { position: static; margin: 8px 28px 22px; font-size: 15px; text-align: right; }
   .empty-search { position: static; margin-top: 20px; font-size: 16px; }
   .header-panel { top: 73px; }
   .notifications-panel { right: 110px; }
@@ -207,7 +209,7 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
   main { padding: 29px 16px 20px; }
   .welcome h1 { font-size: 32px; letter-spacing: -1px; }
   .welcome p { font-size: 19px; }
-  .tile-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin-top: 25px; }
+  .tile-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 25px; }
   .tile { gap: 20px; min-height: 126px; padding: 18px 23px; }
   .tile-title { font-size: 25px; white-space: normal; }
   .tile-description { font-size: 16px; }
@@ -215,7 +217,6 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
   .tile--narrow .tile-title { font-size: 21px; letter-spacing: -.8px; }
   .tile--narrow .tile-description { font-size: 15px; }
   .tile--narrow .tile-icon { width: 62px; height: 53px; }
-  .page-footer { margin-inline: 16px; font-size: 13px; }
   .header-panel { right: 12px; top: 66px; width: min(370px, calc(100% - 24px)); padding: 20px; }
 }
 
