@@ -161,87 +161,91 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
 @keyframes toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 1199px) {
+  :root {
+    /* At 1200px, match the desktop canvas at 1200 / 1920 = 62.5%.
+       Reflow to the tablet sizes by 1000px, then gradually compact to 320px.
+       Each step is a 0..1px interpolation unit; layout breakpoints only move items. */
+    --reflow-step: clamp(0px, calc((1200px - 100vw) / 200), 1px);
+    --compact-step: clamp(0px, calc((1000px - 100vw) / 680), 1px);
+    --header-inset: calc(35px - 7 * var(--reflow-step) - 16 * var(--compact-step));
+    --content-inset: calc(53.75px - 25.75 * var(--reflow-step) - 12 * var(--compact-step));
+    --panel-inset: calc(26.875px - 6.875 * var(--reflow-step) - 8 * var(--compact-step));
+    --tile-gap: calc(10px + 6 * var(--reflow-step));
+    --tile-height: calc(85px + 59 * var(--reflow-step));
+    --tile-title-size: calc(18.75px + 7.25 * var(--reflow-step) - 2 * var(--compact-step));
+    --tile-description-size: calc(11.25px + 4.75 * var(--reflow-step) - var(--compact-step));
+    --narrow-title-size: calc(15px + 7 * var(--reflow-step) - 3 * var(--compact-step));
+    --narrow-description-size: calc(10.625px + 4.375 * var(--reflow-step) - var(--compact-step));
+  }
   .stage-frame { width: 100% !important; height: auto !important; }
   .stage { display: flex; flex-direction: column; width: 100%; height: auto; min-height: 100svh; transform: none; }
-  .site-header { position: relative; inset: auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; height: 83px; padding: 16px 28px; }
-  .brand-group, .header-actions { display: flex; align-items: center; gap: 16px; }
-  .brand { position: static; height: auto; gap: 11px; font-size: 29px; letter-spacing: -1.1px; }
-  .brand-mark { width: 36px; height: 29px; }
-  .brand-mark > span { width: 18px; height: 25px; }
-  .header-divider { position: static; height: 30px; }
-  .icon-button { position: relative; inset: auto; width: 42px; height: 42px; padding: 5px; }
-  .icon-button svg { width: 29px; height: 29px; }
-  .global-search { position: static; flex: 1; max-width: 390px; height: 45px; gap: 13px; padding: 8px 13px; border-radius: 11px; }
-  .global-search > svg { width: 23px; height: 23px; }
-  .global-search input { font-size: 18px; }
-  .notification-dot { width: 12px; height: 12px; }
-  .profile-button { position: static; height: auto; gap: 9px; }
-  .avatar { width: 39px; height: 39px; }
-  .profile-button > svg { width: 18px; height: 18px; }
-  main { flex: 1; padding: 38px 28px 24px; }
+  .site-header {
+    position: relative; inset: auto; display: flex; align-items: center; justify-content: space-between;
+    gap: calc(15px + 9 * var(--reflow-step) - 16 * var(--compact-step));
+    height: calc(57.5px + 25.5 * var(--reflow-step));
+    padding: calc(10px + 6 * var(--reflow-step) - 2 * var(--compact-step)) var(--header-inset);
+  }
+  .brand-group, .header-actions { display: flex; align-items: center; gap: calc(10px + 6 * var(--reflow-step) - 11 * var(--compact-step)); }
+  .brand { position: static; height: auto; gap: calc(10px + var(--reflow-step) - 4 * var(--compact-step)); font-size: calc(25px + 4 * var(--reflow-step) - 5 * var(--compact-step)); letter-spacing: -1.1px; }
+  .brand-mark { width: calc(31.25px + 4.75 * var(--reflow-step) - 4 * var(--compact-step)); height: calc(23.75px + 5.25 * var(--reflow-step) - 2 * var(--compact-step)); }
+  .brand-mark > span { width: calc(15.625px + 2.375 * var(--reflow-step) - 2 * var(--compact-step)); height: calc(20.625px + 4.375 * var(--reflow-step) - var(--compact-step)); }
+  .header-divider { position: static; height: calc(25px + 5 * var(--reflow-step)); }
+  .icon-button { position: relative; inset: auto; width: calc(33.75px + 8.25 * var(--reflow-step) - 10 * var(--compact-step)); height: calc(33.75px + 8.25 * var(--reflow-step) - 6 * var(--compact-step)); padding: calc(3.75px + 1.25 * var(--reflow-step)); }
+  .icon-button svg { width: calc(25px + 4 * var(--reflow-step) - 4 * var(--compact-step)); height: calc(25px + 4 * var(--reflow-step) - 4 * var(--compact-step)); }
+  .global-search {
+    position: static; flex: 1; max-width: calc(270.625px + 119.375 * var(--reflow-step));
+    height: calc(33.125px + 11.875 * var(--reflow-step));
+    gap: calc(12.5px + .5 * var(--reflow-step) - 3 * var(--compact-step));
+    padding: calc(5.625px + 2.375 * var(--reflow-step)) calc(10.625px + 2.375 * var(--reflow-step));
+    border-radius: calc(8.75px + 2.25 * var(--reflow-step));
+  }
+  .global-search > svg { width: calc(18.75px + 4.25 * var(--reflow-step)); height: calc(18.75px + 4.25 * var(--reflow-step)); }
+  .global-search input { font-size: calc(15px + 3 * var(--reflow-step) - 2 * var(--compact-step)); }
+  .notification-dot { width: calc(10.625px + 1.375 * var(--reflow-step)); height: calc(10.625px + 1.375 * var(--reflow-step)); }
+  .profile-button { position: static; height: auto; gap: calc(9.375px - .375 * var(--reflow-step) - 6 * var(--compact-step)); }
+  .avatar { width: calc(31.25px + 7.75 * var(--reflow-step) - 7 * var(--compact-step)); height: calc(31.25px + 7.75 * var(--reflow-step) - 7 * var(--compact-step)); }
+  .profile-button > svg { width: calc(15px + 3 * var(--reflow-step) - 5 * var(--compact-step)); height: calc(15px + 3 * var(--reflow-step) - 5 * var(--compact-step)); }
+  main { flex: 1; padding: calc(29.375px + 8.625 * var(--reflow-step) - 9 * var(--compact-step)) var(--content-inset) 24px; }
   .welcome { position: static; }
-  .welcome h1 { font-size: 40px; letter-spacing: -1.2px; }
-  .welcome p { margin-top: 6px; font-size: 23px; letter-spacing: -.5px; }
-  .tile-layout { position: static; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: none; grid-auto-rows: minmax(144px, auto); grid-auto-flow: dense; margin-top: 30px; }
-  .tile { min-height: 132px; grid-column: span 2; grid-row: auto; gap: 20px; padding: 18px 25px; border-radius: 14px; }
-  .tile-icon { width: 65px; height: 65px; border-radius: 14px; }
-  .tile-icon svg { width: 43px; height: 43px; }
-  .tile-title { font-size: 26px; letter-spacing: -.8px; }
-  .tile-description { font-size: 16px; white-space: normal; letter-spacing: -.35px; }
-  .tile--narrow { grid-column: span 1; min-height: 142px; gap: 6px; padding: 12px 9px; }
-  .tile--narrow .tile-title { font-size: 22px; letter-spacing: -.7px; }
-  .tile--narrow .tile-description { font-size: 15px; white-space: normal; letter-spacing: -.35px; }
-  .empty-search { position: static; margin-top: 20px; font-size: 16px; }
-  .header-panel { top: 73px; }
-  .notifications-panel { right: 110px; }
-  .profile-panel { right: 20px; }
+  .welcome h1 { font-size: calc(36.25px + 3.75 * var(--reflow-step) - 11 * var(--compact-step)); letter-spacing: -1px; }
+  .welcome p { margin-top: calc(4.375px + 1.625 * var(--reflow-step)); font-size: calc(20px + 3 * var(--reflow-step) - 6 * var(--compact-step)); letter-spacing: -.5px; }
+  .tile-layout {
+    position: static; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: none;
+    grid-auto-rows: minmax(var(--tile-height), auto); grid-auto-flow: dense; gap: var(--tile-gap);
+    margin-top: calc(10px + 20 * var(--reflow-step) - 5 * var(--compact-step));
+  }
+  .tile {
+    min-height: var(--tile-height); grid-column: span 2; grid-row: auto;
+    gap: calc(12.5px + 7.5 * var(--reflow-step) - 4 * var(--compact-step));
+    padding: calc(8.75px + 9.25 * var(--reflow-step)) calc(15px + 10 * var(--reflow-step) - 8 * var(--compact-step));
+    border-radius: calc(10.625px + 3.375 * var(--reflow-step));
+  }
+  .tile-icon { width: calc(48.75px + 16.25 * var(--reflow-step) - 5 * var(--compact-step)); height: calc(47.5px + 17.5 * var(--reflow-step) - 5 * var(--compact-step)); border-radius: calc(10px + 4 * var(--reflow-step)); }
+  .tile-icon svg { width: calc(30.625px + 12.375 * var(--reflow-step) - 3 * var(--compact-step)); height: calc(30.625px + 12.375 * var(--reflow-step) - 3 * var(--compact-step)); }
+  .tile-copy { gap: calc(2.5px + 1.5 * var(--reflow-step)); }
+  .tile-title { font-size: var(--tile-title-size); white-space: normal; letter-spacing: -.8px; }
+  .tile-description { font-size: var(--tile-description-size); white-space: normal; letter-spacing: -.35px; }
+  .tile--narrow { grid-column: span 1; gap: calc(2.5px + 3.5 * var(--reflow-step)); padding: calc(5px + 7 * var(--reflow-step)) calc(5px + 4 * var(--reflow-step) - 4 * var(--compact-step)); }
+  .tile--narrow .tile-icon { width: calc(40px + 22 * var(--reflow-step) - 6 * var(--compact-step)); height: calc(33.75px + 19.25 * var(--reflow-step) - 5 * var(--compact-step)); border-radius: calc(9.375px + 5.625 * var(--reflow-step)); }
+  .tile--narrow .tile-icon svg { width: calc(25px + 15 * var(--reflow-step) - 4 * var(--compact-step)); height: calc(25px + 15 * var(--reflow-step) - 4 * var(--compact-step)); }
+  .tile--narrow .tile-title { font-size: var(--narrow-title-size); letter-spacing: -.8px; }
+  .tile--narrow .tile-description { font-size: var(--narrow-description-size); white-space: normal; letter-spacing: -.35px; }
+  .empty-search { position: static; margin-top: 20px; font-size: var(--tile-description-size); }
+  .header-panel { top: calc(52.5px + 20.5 * var(--reflow-step) - 7 * var(--compact-step)); width: min(calc(231.25px + 138.75 * var(--reflow-step)), calc(100% - 2 * var(--panel-inset))); padding: calc(15.625px + 9.375 * var(--reflow-step) - 5 * var(--compact-step)); }
+  .header-panel h2 { font-size: calc(14.375px + 8.625 * var(--reflow-step) - 3 * var(--compact-step)); }
+  .header-panel p, .panel-action { font-size: calc(10.625px + 6.375 * var(--reflow-step) - 2 * var(--compact-step)); }
+  .panel-note, .profile-summary p { font-size: calc(9.375px + 5.625 * var(--reflow-step) - var(--compact-step)); }
+  .notifications-panel { right: calc(112.5px - 2.5 * var(--reflow-step) - 98 * var(--compact-step)); }
+  .profile-panel { right: var(--panel-inset); }
 }
 
 @media (max-width: 679px) {
-  .site-header { flex-wrap: wrap; gap: 16px 8px; height: auto; padding: 16px; }
-  .brand-group { gap: 8px; }
-  .brand { font-size: 26px; gap: 9px; }
-  .brand-mark { width: 32px; height: 27px; }
-  .brand-mark > span { width: 16px; height: 24px; }
-  .header-actions { margin-left: auto; gap: 7px; }
+  .site-header { flex-wrap: wrap; height: auto; }
+  .header-actions { margin-left: auto; }
   .header-divider { display: none; }
-  .icon-button { width: 38px; height: 38px; }
-  .icon-button svg { width: 27px; height: 27px; }
-  .global-search { order: 3; flex: 0 0 100%; max-width: none; height: 45px; }
-  .global-search input { font-size: 17px; }
-  .profile-button { gap: 5px; }
-  .profile-button > svg { width: 15px; height: 15px; }
-  .avatar { width: 36px; height: 36px; }
-  main { padding: 29px 16px 20px; }
-  .welcome h1 { font-size: 32px; letter-spacing: -1px; }
-  .welcome p { font-size: 19px; }
-  .tile-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 25px; }
-  .tile { gap: 20px; min-height: 126px; padding: 18px 23px; }
-  .tile-title { font-size: 25px; white-space: normal; }
-  .tile-description { font-size: 16px; }
-  .tile--narrow { min-height: 143px; gap: 6px; padding: 12px 8px; }
-  .tile--narrow .tile-title { font-size: 21px; letter-spacing: -.8px; }
-  .tile--narrow .tile-description { font-size: 15px; }
-  .tile--narrow .tile-icon { width: 62px; height: 53px; }
-  .header-panel { right: 12px; top: 66px; width: min(370px, calc(100% - 24px)); padding: 20px; }
-}
-
-@media (max-width: 359px) {
-  .site-header { padding: 14px 12px; }
-  .brand { font-size: 24px; gap: 7px; }
-  .brand-group { gap: 5px; }
-  .header-actions { gap: 4px; }
-  .icon-button { width: 32px; height: 36px; }
-  .icon-button svg { width: 25px; height: 25px; }
-  .avatar { width: 32px; height: 32px; }
-  .profile-button { gap: 3px; }
-  .profile-button > svg { width: 13px; height: 13px; }
-  .welcome h1 { font-size: 29px; }
-  .welcome p { font-size: 17px; }
-  .tile { padding-inline: 17px; gap: 16px; }
-  .tile--narrow { padding-inline: 5px; }
-  .tile--narrow .tile-title { font-size: 19px; }
-  .tile--narrow .tile-description { font-size: 14px; }
+  .global-search { order: 3; flex: 0 0 100%; max-width: none; }
+  .tile-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .header-panel { right: var(--panel-inset); }
 }
 
 @media (prefers-reduced-motion: reduce) {
