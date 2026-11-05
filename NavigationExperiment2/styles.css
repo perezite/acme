@@ -114,6 +114,7 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
   grid-template-rows: repeat(5, 136px); gap: 16px;
   pointer-events: none;
 }
+.tile-gap { grid-column: var(--column); grid-row: var(--row); pointer-events: none; }
 .tile {
   position: relative; min-width: 0;
   grid-column: var(--column) / span var(--span); grid-row: var(--row);
@@ -211,7 +212,7 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
   .welcome p { margin-top: calc(4.375px + 1.625 * var(--reflow-step)); font-size: calc(20px + 3 * var(--reflow-step) - 6 * var(--compact-step)); letter-spacing: -.5px; }
   .tile-layout {
     position: static; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: none;
-    grid-auto-rows: minmax(var(--tile-height), auto); grid-auto-flow: dense; gap: var(--tile-gap);
+    grid-auto-rows: minmax(var(--tile-height), auto); grid-auto-flow: row; gap: var(--tile-gap);
     margin-top: calc(10px + 20 * var(--reflow-step) - 5 * var(--compact-step));
   }
   .tile {
@@ -230,6 +231,7 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
   .tile--narrow .tile-icon svg { width: calc(25px + 15 * var(--reflow-step) - 4 * var(--compact-step)); height: calc(25px + 15 * var(--reflow-step) - 4 * var(--compact-step)); }
   .tile--narrow .tile-title { font-size: var(--narrow-title-size); letter-spacing: -.8px; }
   .tile--narrow .tile-description { font-size: var(--narrow-description-size); white-space: normal; letter-spacing: -.35px; }
+  .tile-gap { grid-column: span 1; grid-row: auto; }
   .empty-search { position: static; margin-top: 20px; font-size: var(--tile-description-size); }
   .header-panel { top: calc(52.5px + 20.5 * var(--reflow-step) - 7 * var(--compact-step)); width: min(calc(231.25px + 138.75 * var(--reflow-step)), calc(100% - 2 * var(--panel-inset))); padding: calc(15.625px + 9.375 * var(--reflow-step) - 5 * var(--compact-step)); }
   .header-panel h2 { font-size: calc(14.375px + 8.625 * var(--reflow-step) - 3 * var(--compact-step)); }

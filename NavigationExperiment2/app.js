@@ -2,7 +2,7 @@
   'use strict';
 
   // Desktop placement on an eight-column grid. Wide tiles span two columns;
-  // smaller viewports use the automatic grid layout in styles.css.
+  // smaller viewports reflow the same sequence, including its empty cells.
   const tiles = [
     { id: 'projekte', title: 'Projekte', description: 'Projekte planen und steuern', icon: 'layers', column: 1, row: 1 },
     { id: 'aufgaben', title: 'Aufgaben', description: 'Aufgaben erledigen', icon: 'check-square', column: 3, row: 1, narrow: true },
@@ -51,7 +51,23 @@
   }
 
   function buildTiles() {
-    for (const tile of tiles) {
+    const columns = 8;
+    const tilesByCell = new Map(tiles.map(tile => [(tile.row - 1) * columns + tile.column - 1, tile]));
+    const cellCount = Math.max(...tiles.map(tile => tile.row)) * columns;
+    for (let cell = 0; cell < cellCount;) {
+      const tile = tilesByCell.get(cell);
+      if (!tile) {
+        const gap = document.createElement('span');
+        gap.className = 'tile-gap';
+        gap.setAttribute('aria-hidden', 'true');
+        gap.style.setProperty('--column', String(cell % columns + 1));
+        gap.style.setProperty('--row', String(Math.floor(cell / columns) + 1));
+        layout.append(gap);
+        cell += 1;
+        continue;
+      }
+      const span = tile.narrow ? 1 : 2;
+      cell += span;
       const button = document.createElement('button');
       button.type = 'button';
       button.className = `tile${tile.narrow ? ' tile--narrow' : ''}${tile.purple ? ' tile--purple' : ''}`;
@@ -60,7 +76,7 @@
       for (const property of ['column', 'row']) {
         button.style.setProperty(`--${property}`, String(tile[property]));
       }
-      button.style.setProperty('--span', tile.narrow ? '1' : '2');
+      button.style.setProperty('--span', String(span));
       const icon = document.createElement('span');
       icon.className = 'tile-icon';
       icon.append(makeIcon(tile.icon));

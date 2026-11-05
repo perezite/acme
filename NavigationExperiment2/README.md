@@ -23,6 +23,8 @@ Ab 1200px Fensterbreite wird die Referenzfläche proportional an die verfügbare
 
 Unter 1200px ordnen sich die Kacheln in vier Spalten an, unter 680px in zwei Spalten. Breite Kacheln belegen weiterhin zwei Spalten. Unter 680px wechselt die Suche in eine eigene Kopfzeile.
 
+Die sechs leeren Rasterplätze der Desktop-Anordnung bleiben in allen Stufen als unsichtbare, nicht bedienbare Platzhalter erhalten. Beim Umbruch werden sie zusammen mit den Kacheln in ihrer ursprünglichen Reihenfolge angeordnet. Lücken werden nicht nachträglich mit anderen Kacheln aufgefüllt. Passt eine breite Kachel nicht mehr in die verbleibende Zeile, beginnt sie in der nächsten; dadurch können zusätzliche Leerstellen entstehen.
+
 Schrift, Symbole, Kachelhöhen und Abstände ändern sich fliessend. Am Übergang bei 1200px schliessen sie an die mit 62,5 % skalierte Desktop-Fläche an. Bis 1000px gehen sie in die Tablet-Grössen über; zwischen 1000px und 320px werden sie allmählich kompakter. Die Layout-Grenze bei 680px ändert nur die Anordnung, ohne eine neue Grössenstufe einzuführen. Eine zusätzliche Grössenstufe bei 360px entfällt.
 
 Die gemeinsamen CSS-Variablen `--reflow-step` und `--compact-step` steuern diese Übergänge. Die Schriftgrössen an den drei Bezugspunkten sind:
