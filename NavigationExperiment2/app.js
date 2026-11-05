@@ -34,12 +34,16 @@
   const frame = document.getElementById('stage-frame');
   const layout = document.getElementById('tile-layout');
   const search = document.getElementById('tile-search');
+  const searchForm = document.getElementById('search-form');
+  const searchResults = document.getElementById('search-results');
+  const searchResultList = document.getElementById('search-result-list');
   const notificationsButton = document.getElementById('notifications-button');
   const profileButton = document.getElementById('profile-button');
   const panels = [document.getElementById('notifications-panel'), document.getElementById('profile-panel')];
   const tileButtons = new Map();
   let toastTimer;
   let searchTimer;
+  let activeResultIndex = -1;
 
   function makeIcon(name) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -131,6 +135,7 @@
 
   function selectTile(tile) {
     closePanels();
+    closeSearchResults();
     tileButtons.forEach((button, id) => button.setAttribute('aria-pressed', String(id === tile.id)));
     toast(`${tile.title} ausgewählt.`);
   }
@@ -158,14 +163,92 @@
     return tiles.filter(tile => `${tile.title} ${tile.description}`.toLocaleLowerCase('de').includes(query));
   }
 
+  function setActiveResult(index, ensureVisible = false) {
+    activeResultIndex = index;
+    const options = Array.from(searchResultList.children);
+    options.forEach((option, i) => option.setAttribute('aria-selected', String(i === index)));
+    const active = options[index];
+    if (active) {
+      search.setAttribute('aria-activedescendant', active.id);
+      if (ensureVisible) active.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    } else {
+      search.removeAttribute('aria-activedescendant');
+    }
+  }
+
+  function closeSearchResults() {
+    searchResults.hidden = true;
+    search.setAttribute('aria-expanded', 'false');
+    setActiveResult(-1);
+  }
+
+  function resizeSearchResults() {
+    if (searchResults.hidden) return;
+    const viewport = window.visualViewport;
+    const viewportBottom = viewport ? viewport.offsetTop + viewport.height : window.innerHeight;
+    const available = viewportBottom - searchForm.getBoundingClientRect().bottom - 20;
+    searchResults.style.setProperty('--search-results-room', `${Math.max(0, Math.min(360, available))}px`);
+  }
+
+  function activateSearchResult(tile) {
+    search.value = '';
+    updateSearch();
+    selectTile(tile);
+    const button = tileButtons.get(tile.id);
+    button.focus({ preventScroll: true });
+    button.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
+  }
+
+  function showSearchResults(matches) {
+    searchResultList.replaceChildren();
+    matches.forEach((tile, index) => {
+      const option = document.createElement('button');
+      option.type = 'button';
+      option.id = `search-option-${tile.id}`;
+      option.className = `search-result${tile.purple ? ' search-result--purple' : ''}`;
+      option.setAttribute('role', 'option');
+      option.setAttribute('aria-selected', 'false');
+      option.tabIndex = -1;
+      const icon = document.createElement('span');
+      icon.className = 'search-result-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.append(makeIcon(tile.icon));
+      const copy = document.createElement('span');
+      copy.className = 'search-result-copy';
+      const title = document.createElement('span');
+      title.className = 'search-result-title';
+      title.textContent = tile.title;
+      const description = document.createElement('span');
+      description.className = 'search-result-description';
+      description.textContent = tile.description;
+      copy.append(title, description);
+      const arrow = makeIcon('chevron');
+      arrow.classList.add('search-result-chevron');
+      option.append(icon, copy, arrow);
+      option.addEventListener('click', () => activateSearchResult(tile));
+      option.addEventListener('pointerenter', event => {
+        if (event.pointerType === 'mouse') setActiveResult(index);
+      });
+      searchResultList.append(option);
+    });
+    document.getElementById('search-result-count').textContent = matches.length ? `${matches.length} Treffer` : 'Keine Treffer';
+    document.getElementById('empty-search').hidden = matches.length > 0;
+    searchResults.hidden = false;
+    search.setAttribute('aria-expanded', 'true');
+    setActiveResult(-1);
+    resizeSearchResults();
+  }
+
   function updateSearch() {
     const query = search.value.trim();
-    const matches = new Set(matchingTiles().map(tile => tile.id));
-    tileButtons.forEach((button, id) => button.classList.toggle('is-dimmed', Boolean(query) && !matches.has(id)));
-    document.getElementById('empty-search').hidden = !query || matches.size > 0;
+    const matches = matchingTiles();
+    const matchIds = new Set(matches.map(tile => tile.id));
+    tileButtons.forEach((button, id) => button.classList.toggle('is-dimmed', Boolean(query) && !matchIds.has(id)));
+    if (query && document.activeElement === search) showSearchResults(matches);
+    else closeSearchResults();
     window.clearTimeout(searchTimer);
     searchTimer = window.setTimeout(() => {
-      document.getElementById('search-status').textContent = query ? `${matches.size} passende Arbeitsbereiche.` : '';
+      document.getElementById('search-status').textContent = query ? (matches.length === 1 ? '1 passender Arbeitsbereich.' : `${matches.length} passende Arbeitsbereiche.`) : '';
     }, 220);
   }
 
@@ -180,7 +263,12 @@
   fitReferenceCanvas();
   setTheme(root.dataset.theme, false);
   window.addEventListener('resize', fitReferenceCanvas);
+  window.addEventListener('resize', resizeSearchResults);
+  window.addEventListener('scroll', resizeSearchResults, { passive: true });
+  window.visualViewport?.addEventListener('resize', resizeSearchResults);
+  window.visualViewport?.addEventListener('scroll', resizeSearchResults);
   document.fonts?.ready.then(fitReferenceCanvas);
+  document.fonts?.ready.then(resizeSearchResults);
 
   document.getElementById('theme-button').addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
   document.getElementById('profile-theme-button').addEventListener('click', () => { setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'); closePanels(); });
@@ -191,14 +279,25 @@
   profileButton.addEventListener('click', () => togglePanel(panels[1], profileButton));
   document.addEventListener('click', event => {
     if (!event.target.closest('.header-panel, .notification-button, .profile-button')) closePanels();
+    if (!event.target.closest('.global-search')) closeSearchResults();
+  });
+  document.addEventListener('focusin', event => {
+    if (!searchForm.contains(event.target)) closeSearchResults();
   });
   document.addEventListener('keydown', event => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
       event.preventDefault();
       search.focus();
       search.select();
+      updateSearch();
     }
     if (event.key === 'Escape') {
+      if (!searchResults.hidden) {
+        event.preventDefault();
+        search.focus();
+        closeSearchResults();
+        return;
+      }
       const activePanel = panels.findIndex(panel => !panel.hidden);
       closePanels();
       if (activePanel >= 0) (activePanel === 0 ? notificationsButton : profileButton).focus();
@@ -206,12 +305,23 @@
     }
   });
   search.addEventListener('input', updateSearch);
-  document.getElementById('search-form').addEventListener('submit', event => {
+  search.addEventListener('focus', () => { closePanels(); updateSearch(); });
+  search.addEventListener('click', updateSearch);
+  searchResultList.addEventListener('mousedown', event => event.preventDefault());
+  search.addEventListener('keydown', event => {
+    if (event.isComposing || !['ArrowDown', 'ArrowUp'].includes(event.key) || !search.value.trim()) return;
+    const matches = matchingTiles();
+    if (!matches.length) return;
+    event.preventDefault();
+    if (searchResults.hidden) showSearchResults(matches);
+    const next = event.key === 'ArrowDown' ? activeResultIndex + 1 : (activeResultIndex < 0 ? matches.length - 1 : activeResultIndex - 1);
+    setActiveResult((next + matches.length) % matches.length, true);
+  });
+  searchForm.addEventListener('submit', event => {
     event.preventDefault();
     const matches = matchingTiles();
     if (!matches.length) return;
-    selectTile(matches[0]);
-    tileButtons.get(matches[0].id).focus();
+    activateSearchResult(matches[activeResultIndex] || matches[0]);
   });
   document.getElementById('home-button').addEventListener('click', () => {
     search.value = '';

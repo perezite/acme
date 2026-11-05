@@ -10,7 +10,8 @@ Eigenständiger HTML-Prototyp mit einem Screen, möglichst nah an den gelieferte
 
 - Die Kacheln sind echte Buttons. Ein Klick setzt die grüne Auswahl und zeigt eine kurze Toast-Bestätigung. Es werden keine weiteren Screens geöffnet.
 - Mond/Sonne schaltet zwischen Light und Dark Mode um. Die Auswahl wird, soweit verfügbar, im Browser gespeichert.
-- Die Suche gleicht Titel und Untertitel ab. Andere Kacheln werden abgeblendet; ihre Positionen bleiben erhalten. Enter wählt den ersten Treffer aus.
+- Die Suche gleicht Titel und Untertitel ab. Eine kompakte, bei vielen Treffern scrollbar bleibende Liste erscheint direkt unter dem Suchfeld, einschliesslich einer Rückmeldung bei fehlenden Treffern. Die Höhe berücksichtigt den sichtbaren Bereich, auch bei eingeblendeter Bildschirmtastatur. Andere Kacheln werden weiterhin abgeblendet; ihre Positionen bleiben erhalten.
+- Ein Klick auf einen Suchtreffer oder Enter wählt den Arbeitsbereich aus, leert den Suchfilter und bringt die Kachel ins Sichtfeld. Die Pfeiltasten wechseln durch die Treffer; ohne Vorauswahl nimmt Enter den ersten. Escape, Tab aus dem Suchfeld oder ein Klick ausserhalb schliesst die Liste. Ein erneuter Klick ins Suchfeld öffnet sie wieder; Escape bei bereits geschlossener Liste leert den Suchbegriff.
 - Glocke und Profil öffnen kleine Popover auf demselben Screen. Escape oder ein Klick ausserhalb schliesst sie.
 - Das Logo setzt die Suche und Kachelauswahl zurück. Strg+K bzw. Cmd+K fokussiert die Suche.
 - Buttons und Suche sind per Tastatur bedienbar. Reduzierte Bewegung wird berücksichtigt.

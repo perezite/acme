@@ -62,7 +62,12 @@
 
           <form class="global-search" id="search-form" role="search">
             <svg aria-hidden="true"><use href="#i-search"></use></svg>
-            <input type="search" id="tile-search" aria-label="Arbeitsbereiche suchen" placeholder="Suchen …" autocomplete="off" spellcheck="false" />
+            <input type="search" id="tile-search" role="combobox" aria-label="Arbeitsbereiche suchen" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="search-result-list" aria-expanded="false" placeholder="Suchen …" autocomplete="off" spellcheck="false" />
+            <div class="search-results" id="search-results" hidden>
+              <p class="search-results-heading" id="search-result-count"></p>
+              <div class="search-result-list" id="search-result-list" role="listbox" aria-label="Suchtreffer"></div>
+              <p class="search-empty" id="empty-search" hidden>Versuche einen anderen Suchbegriff.</p>
+            </div>
           </form>
 
           <div class="header-actions">
@@ -78,7 +83,6 @@
             <p>Alles für deinen Arbeitstag.</p>
           </div>
           <nav class="tile-layout" id="tile-layout" aria-label="Deine Arbeitsbereiche"></nav>
-          <p class="empty-search" id="empty-search" hidden>Keine passenden Arbeitsbereiche gefunden.</p>
         </main>
 
         <section class="header-panel notifications-panel" id="notifications-panel" aria-labelledby="notifications-heading" hidden>
