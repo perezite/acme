@@ -29,5 +29,6 @@ Unter 1200px ordnen sich die Kacheln in vier Spalten an, unter 680px in zwei Spa
 - `styles.css`: Design, Farbschemata und responsive Layouts
 - `app.js`: Kachelinhalte, Auswahl, Suche, Popover und Theme-Wechsel
 - `assets/fonts/`: lokal eingebundene Inter-Schrift und SIL Open Font License
+- `assets/profile-alex.png`: lokal eingebundenes, mit Imagegen erzeugtes Porträt für das fiktive Demoprofil Alex; der verwendete Prompt steht in `assets/profile-alex.prompt.txt`.
 
 Die Inter-Schrift stammt aus dem offiziellen [Inter-Projekt](https://github.com/rsms/inter), die Lizenz liegt unter `assets/fonts/OFL.txt`.

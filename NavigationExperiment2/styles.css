@@ -102,7 +102,7 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
 .notification-dot { position: absolute; top: 4px; right: 5px; width: 17px; height: 17px; border-radius: 50%; background: #bb82ed; box-shadow: 0 0 0 1px var(--header); }
 .profile-divider { left: 1756px; top: 26px; }
 .profile-button { position: absolute; left: 1792px; top: 19px; display: flex; align-items: center; gap: 15px; height: 53px; padding: 0; border: 0; border-radius: 30px; background: transparent; }
-.avatar { display: grid; place-items: center; flex: none; width: 50px; height: 50px; background: linear-gradient(140deg, var(--mint-top), var(--mint-bottom)); color: var(--icon-ink); border-radius: 50%; font-size: 28px; font-weight: 750; }
+.avatar { display: block; flex: none; width: 50px; height: 50px; object-fit: cover; object-position: center; background: linear-gradient(140deg, var(--mint-top), var(--mint-bottom)); border-radius: 50%; }
 .profile-button > svg { width: 24px; height: 24px; stroke-width: 2.4; }
 .welcome { position: absolute; left: 110px; top: 139px; }
 .welcome h1 { margin: 0; font-size: 58px; line-height: 1.08; font-weight: 800; letter-spacing: -.5px; }
@@ -133,10 +133,10 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
 .tile-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .tile-title { display: block; font-size: 30px; line-height: 1.16; font-weight: 800; letter-spacing: -1px; white-space: nowrap; }
 .tile-description { display: block; color: var(--tile-description); font-size: 18px; line-height: 1.35; font-weight: 400; letter-spacing: -.45px; white-space: nowrap; }
-.tile--narrow { flex-direction: column; justify-content: center; gap: 4px; padding: 7px 8px 10px; text-align: center; }
+.tile--narrow { flex-direction: column; justify-content: center; gap: 4px; padding: 8px; text-align: center; }
 .tile--narrow .tile-icon { width: 64px; height: 54px; border-radius: 15px; }
 .tile--narrow .tile-icon svg { width: 40px; height: 40px; }
-.tile--narrow .tile-copy { align-items: center; gap: 3px; }
+.tile--narrow .tile-copy { align-items: center; }
 .tile--narrow .tile-title { font-size: 24px; line-height: 1.25; letter-spacing: -.85px; }
 .tile--narrow .tile-description { font-size: 17px; line-height: 1.35; letter-spacing: -.55px; }
 .tile.is-dimmed { opacity: .18; filter: grayscale(.35); }
@@ -176,7 +176,7 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
   .global-search input { font-size: 18px; }
   .notification-dot { width: 12px; height: 12px; }
   .profile-button { position: static; height: auto; gap: 9px; }
-  .avatar { width: 39px; height: 39px; font-size: 22px; }
+  .avatar { width: 39px; height: 39px; }
   .profile-button > svg { width: 18px; height: 18px; }
   main { flex: 1; padding: 38px 28px 24px; }
   .welcome { position: static; }
@@ -211,7 +211,7 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
   .global-search input { font-size: 17px; }
   .profile-button { gap: 5px; }
   .profile-button > svg { width: 15px; height: 15px; }
-  .avatar { width: 36px; height: 36px; font-size: 21px; }
+  .avatar { width: 36px; height: 36px; }
   main { padding: 29px 16px 20px; }
   .welcome h1 { font-size: 32px; letter-spacing: -1px; }
   .welcome p { font-size: 19px; }
@@ -233,7 +233,7 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
   .header-actions { gap: 4px; }
   .icon-button { width: 32px; height: 36px; }
   .icon-button svg { width: 25px; height: 25px; }
-  .avatar { width: 32px; height: 32px; font-size: 19px; }
+  .avatar { width: 32px; height: 32px; }
   .profile-button { gap: 3px; }
   .profile-button > svg { width: 13px; height: 13px; }
   .welcome h1 { font-size: 29px; }
