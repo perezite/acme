@@ -197,6 +197,8 @@ const icon = (name, extra = "") => `<svg class="${extra}" aria-hidden="true"><us
 const esc = (value) => String(value).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
 const initials = (text) => text.split(/\s+/).map((part) => part[0]).slice(0, 2).join("").toUpperCase();
 const current = () => modules.find((item) => item.id === currentModule);
+const homeMenu = new HomeMenuEditor({ groups, modules, icon, escape: esc, render: renderHome, notify: toast });
+homeMenu.bindDrag(main);
 
 function restoreDataRecords() {
   for (const module of modules) {
@@ -269,6 +271,7 @@ function persistDataRecords(id) {
 }
 
 function navigateToModule(id) {
+  if (!homeMenu.allowNavigation()) return;
   if (!modules.some((item) => item.id === id)) return renderHome();
   currentDataObject = null;
   history.pushState({ module: id }, "", `#${id}`);
@@ -276,6 +279,7 @@ function navigateToModule(id) {
 }
 
 function navigateToDataObject(id) {
+  if (!homeMenu.allowNavigation()) return;
   if (!modules.some((item) => item.id === id)) return renderHome();
   dataNavigationPath = [{ object: id, filterIds: null, label: dataTableConfig[id]?.title ?? modules.find((item) => item.id === id).title }];
   dataSelectedEntityId = null;
@@ -430,27 +434,15 @@ function renderHome() {
         <h1>Arbeitsbereiche</h1>
         <p class="welcome-copy">Wähle einen Bereich, um loszulegen.</p>
       </div>
-      <div class="workspace-select"><span class="workspace-avatar">A</span><span>Arbeitsbereich</span><strong>Acme Studio</strong>${icon("more")}</div>
+      <div class="home-header-controls">
+        <div class="workspace-select"><span class="workspace-avatar">A</span><span>Arbeitsbereich</span><strong>Acme Studio</strong>${icon("more")}</div>
+        ${homeMenu.editing ? "" : `<div class="home-menu-actions" role="group" aria-label="Startseitenoptionen"><button type="button" class="text-button" data-home-action="edit">${icon("pencil")} Startseite anpassen</button><button type="button" class="text-button" data-action="show-shortcuts">Tastenkürzel ${icon("arrow")}</button></div>`}
+      </div>
     </section>
-    <div class="section-stack">
-      ${groups.map((group) => `
-        <section class="category-card" aria-labelledby="group-${group.title.toLowerCase()}">
-          <h2 class="category-heading" id="group-${group.title.toLowerCase()}">${group.title}</h2>
-          <p class="category-subtitle">${group.subtitle}</p>
-          <div class="tile-grid">
-            ${group.ids.map((id) => {
-              const item = modules.find((entry) => entry.id === id);
-              const isDataObject = group.kind === "data";
-              return `<button class="nav-tile${isDataObject ? " nav-tile-data" : ""}" ${isDataObject ? `data-data-object="${item.id}"` : `data-module="${item.id}"`} aria-label="${isDataObject ? `${item.title} Rohdaten öffnen` : `${item.title} öffnen`}">
-                <span class="tile-icon">${icon(item.icon)}</span>
-                <span class="tile-copy"><span class="tile-title">${item.title}</span><span class="tile-desc">${isDataObject ? "Rohdaten-Tabelle" : item.desc}</span></span>
-                ${icon("arrow", "tile-arrow")}
-              </button>`;
-            }).join("")}
-          </div>
-        </section>`).join("")}
-    </div>
-    <footer class="home-footer"><span class="tip">${icon("spark")} Tipp: Nutze die Suche, um direkt zu einem Bereich zu springen.</span><button class="text-button" data-action="show-shortcuts">Tastenkürzel anzeigen ${icon("arrow")}</button></footer>`;
+    ${homeMenu.render()}
+    <footer class="home-footer">${homeMenu.editing
+      ? '<span>Entfernen ändert nur dein Startmenü. Deine Daten bleiben erhalten.</span>'
+      : `<span class="tip">${icon("spark")} Tipp: Nutze die Suche, um direkt zu einem Bereich zu springen.</span>`}</footer>`;
 }
 
 function recordStatus(text) {
@@ -1446,6 +1438,7 @@ function scheduleTourPosition() {
 }
 
 function showOnboarding() {
+  if (!homeMenu.allowNavigation()) return;
   onboardingStep = 0;
   onboardingReturnModule = currentModule;
   onboardingReturnDataObject = currentDataObject;
@@ -1507,6 +1500,7 @@ function rewindOnboarding() {
 
 document.body.addEventListener("click", (event) => {
   if (tourActive && !event.target.closest(".tour-card")) return;
+  if (homeMenu.handleClick(event)) return;
   const dataSheetRow = event.target.closest("tr[data-sheet-row]");
   if (dataSheetRow && !event.target.closest("[data-action], input, select") && dataSheetRow.dataset.sheetRow !== "new") {
     if (hasDesktopDataEdit()) { blockDesktopDataNavigation(); return; }
@@ -1640,6 +1634,7 @@ document.body.addEventListener("click", (event) => {
 });
 
 document.body.addEventListener("input", (event) => {
+  if (event.target.id === "home-menu-name") event.target.setCustomValidity("");
   if (event.target === searchInput) renderGlobalResults(searchInput.value);
   if (event.target.id === "table-search") { tableFilter = event.target.value; updateTable(); }
   if (event.target.id === "data-search") { dataSearch = event.target.value; renderDataRows(); }
@@ -1651,10 +1646,12 @@ document.body.addEventListener("input", (event) => {
 });
 
 document.body.addEventListener("change", (event) => {
+  homeMenu.handleChange(event);
   if (event.target.matches(".mobile-record-field")) mobileFieldChanged(event.target);
 });
 
 document.body.addEventListener("submit", (event) => {
+  if (homeMenu.handleSubmit(event)) return;
   event.preventDefault();
   if (event.target.id === "create-form") {
     const data = new FormData(event.target);
@@ -1698,6 +1695,7 @@ document.body.addEventListener("keydown", (event) => {
     return;
   }
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); searchInput.focus(); searchInput.select(); }
+  if (homeMenu.handleKeydown(event)) return;
   if (event.key === "Escape") {
     if (overlayRoot.innerHTML) overlayRoot.innerHTML = "";
     else if (mobilePickerState) closeMobilePicker();
@@ -1718,12 +1716,16 @@ main.addEventListener("click", (event) => {
 });
 
 window.addEventListener("beforeunload", (event) => {
-  if (!mobileDataDrafts.size && !hasDesktopDataEdit()) return;
+  if (!mobileDataDrafts.size && !hasDesktopDataEdit() && !homeMenu.dirty) return;
   event.preventDefault();
   event.returnValue = "";
 });
 
 window.addEventListener("popstate", () => {
+  if (!homeMenu.allowNavigation()) {
+    history.pushState({ module: null }, "", `${location.pathname}${location.search}`);
+    return;
+  }
   const id = location.hash.slice(1);
   const dataRoute = /^daten-([a-z0-9-]+)$/.exec(id);
   if (dataRoute && modules.some((item) => item.id === dataRoute[1])) {

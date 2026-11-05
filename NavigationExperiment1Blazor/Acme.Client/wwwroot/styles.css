@@ -45,6 +45,14 @@
 
 * { box-sizing: border-box; }
 body { min-width: 320px; min-height: 100vh; margin: 0; background: radial-gradient(ellipse at 50% -180px, #eaf3ff 0, #f5f8fc 58%); }
+.demo-save-notice { gap: 14px; }
+.demo-save-copy { margin: 0; color: var(--muted); font-size: var(--type-body); line-height: 1.55; }
+.demo-save-guide { padding: 12px 14px; border: 1px solid #dfe8f4; border-radius: var(--radius-md); background: #f6f9fd; color: #566a85; font-size: var(--type-caption); line-height: 1.55; }
+.demo-save-guide strong { display: block; margin-bottom: 4px; color: var(--ink); font-size: var(--type-body); }
+.demo-save-guide b { color: var(--ink); font-weight: 700; }
+:root[data-theme="dark"] .demo-save-guide { border-color: #344256; background: #1b2837; color: #aab9cc; }
+:root[data-theme="dark"] .demo-save-guide strong,
+:root[data-theme="dark"] .demo-save-guide b { color: #e5ecf6; }
 #blazor-error-ui { display: none; position: fixed; inset-inline: 0; bottom: 0; z-index: 1000; padding: 12px 20px; border-top: 1px solid #f0c7c4; background: #fff2f1; color: #7a2520; box-shadow: 0 -4px 18px rgba(39, 52, 73, .12); }
 #blazor-error-ui .reload { margin-left: 6px; color: #9b3029; font-weight: 600; }
 button, input, select, textarea { font: inherit; }

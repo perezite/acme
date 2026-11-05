@@ -66,6 +66,7 @@ public partial class Workspace
     private bool IsDarkMode { get; set; }
     private bool OnlyOpen { get; set; }
     private bool OnboardingActive { get; set; }
+    private bool DemoSaveNoticeShown { get; set; }
     private int OnboardingIndex { get; set; }
     private string? CreateNote { get; set; }
     private string PreferenceName { get; set; } = "Mia Lehmann";
@@ -103,6 +104,7 @@ public partial class Workspace
         "detail" => Field(DetailRecord, 0),
         "account" => "Mein Profil",
         "preferences" => PreferenceTitle ?? "Persönliche Einstellungen",
+        "demo-save-info" => "Änderungen nur in dieser Sitzung",
         _ => "Tastenkürzel"
     };
     private string ModalSubtitle => ModalKind switch
@@ -110,6 +112,7 @@ public partial class Workspace
         "create" => "Fülle die wichtigsten Angaben aus, um fortzufahren.",
         "detail" => Field(DetailRecord, 1),
         "account" or "preferences" => "Verwalte deine Angaben für Acme Studio.",
+        "demo-save-info" => "Die App läuft gerade ohne Datenbank.",
         _ => "Mit ein paar Tasten schneller durch Acme."
     };
     private IReadOnlyList<string> CreateStatuses => CurrentModule?.Id switch
@@ -748,7 +751,16 @@ public partial class Workspace
 
     private async Task PersistStateAsync(string successMessage)
     {
-        if (!DatabaseAvailable) { ShowToast($"{successMessage} Die Änderungen gelten nur für diese Sitzung."); return; }
+        if (!DatabaseAvailable)
+        {
+            ShowToast($"{successMessage} Die Änderungen gelten nur für diese Sitzung.");
+            if (!DemoSaveNoticeShown)
+            {
+                DemoSaveNoticeShown = true;
+                ModalKind = "demo-save-info";
+            }
+            return;
+        }
         try
         {
             var response = await Http.PutAsJsonAsync("/api/prototype/state", State);

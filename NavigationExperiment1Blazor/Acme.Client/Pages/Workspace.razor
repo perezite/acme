@@ -200,6 +200,14 @@
                 {
                     <div class="form-body"><div class="field"><label>Name</label><input @bind="PreferenceName" /></div><div class="field"><label>E-Mail-Adresse</label><input type="email" @bind="PreferenceEmail" /></div><div class="field"><label>E-Mail-Benachrichtigungen</label><select @bind="PreferenceNotifications"><option>Wichtige Updates</option><option>Alle Aktivitäten</option><option>Keine E-Mails</option></select></div></div><footer class="modal-footer"><button class="secondary-button" @onclick="CloseModal">Abbrechen</button><button class="primary-button" @onclick="SavePreferences"><Icon Name="check" /> Speichern</button></footer>
                 }
+                else if (ModalKind == "demo-save-info")
+                {
+                    <div class="form-body demo-save-notice">
+                        <p class="demo-save-copy">Deine Änderung ist nur im Arbeitsspeicher dieser Sitzung vorhanden. Wenn du die App schliesst oder neu startest, wird sie zurückgesetzt.</p>
+                        <div class="demo-save-guide"><strong>Mit Datenbank starten</strong><span>Wähle in Visual Studio <b>Acme.Server</b> als Startprojekt und starte es. Das Server-Projekt stellt die App mit Datenbank bereit.</span></div>
+                    </div>
+                    <footer class="modal-footer"><button class="primary-button" @onclick="CloseModal">Verstanden</button></footer>
+                }
                 else
                 {
                     <div class="form-body"><div class="progress-title"><span>Suche öffnen</span><kbd>Ctrl / ⌘ + K</kbd></div><div class="progress-title"><span>Zur Startseite</span><kbd>Esc</kbd></div><div class="progress-title"><span>Bereich öffnen</span><kbd>Enter</kbd></div></div><footer class="modal-footer"><button class="primary-button" @onclick="CloseModal">Verstanden</button></footer>
