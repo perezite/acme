@@ -126,9 +126,11 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
 .profile-button { position: absolute; left: 1792px; top: 19px; display: flex; align-items: center; gap: 15px; height: 53px; padding: 0; border: 0; border-radius: 30px; background: transparent; }
 .avatar { display: block; flex: none; width: 50px; height: 50px; object-fit: cover; object-position: center; background: linear-gradient(140deg, var(--mint-top), var(--mint-bottom)); border-radius: 50%; }
 .profile-button > svg { width: 24px; height: 24px; stroke-width: 2.4; }
-.welcome { position: absolute; left: 110px; top: 139px; }
+.welcome { position: absolute; left: 110px; right: 86px; top: 139px; }
 .welcome h1 { margin: 0; font-size: 58px; line-height: 1.08; font-weight: 800; letter-spacing: -.5px; }
 .welcome p { margin: 7px 0 0; color: var(--secondary); font-size: 32px; line-height: 1.35; letter-spacing: -.6px; }
+.arrange-button { position: absolute; right: 0; top: 16px; padding: 12px 18px; border: 1px solid var(--border); border-radius: 10px; background: var(--tile); color: var(--text); font-size: 16px; font-weight: 650; box-shadow: var(--shadow); }
+.arrange-button[aria-pressed='true'] { border-color: var(--selected); background: color-mix(in srgb, var(--selected) 12%, var(--tile)); }
 
 .tile-layout {
   position: absolute; top: 268px; left: 86px; right: 86px;
@@ -136,7 +138,9 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
   grid-template-rows: repeat(5, 136px); gap: 16px;
   pointer-events: none;
 }
-.tile-gap { grid-column: var(--column); grid-row: var(--row); pointer-events: none; }
+.tile-gap { grid-column: var(--column); grid-row: var(--row); min-height: 100%; cursor: copy; pointer-events: auto; }
+.tile-gap.drop-slot { outline: 2px dashed var(--selected); outline-offset: -3px; border-radius: 12px; background: color-mix(in srgb, var(--selected) 8%, transparent); }
+.tile-layout.is-arranging { pointer-events: auto; }
 .tile {
   position: relative; min-width: 0;
   grid-column: var(--column) / span var(--span); grid-row: var(--row);
@@ -164,6 +168,14 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
 .tile--narrow .tile-description { font-size: 17px; line-height: 1.35; letter-spacing: -.55px; }
 .tile.is-dimmed { opacity: .18; filter: grayscale(.35); }
 .tile.is-dimmed:hover { opacity: .55; }
+.tile-layout.is-arranging .tile { cursor: grab; touch-action: none; transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease; }
+.tile-layout.is-arranging .tile:hover { box-shadow: 0 0 0 2px color-mix(in srgb, var(--selected) 55%, transparent), var(--shadow); }
+.tile-layout.is-arranging .tile.tile-move-animating { z-index: 2; transition: transform 420ms cubic-bezier(.2,.75,.25,1), box-shadow 420ms ease, opacity 180ms ease; }
+.tile-layout.is-arranging .tile.tile-swap-participant { z-index: 3; }
+.tile-layout.is-arranging .tile.tile-swap-participant::after { content: ''; position: absolute; inset: -5px; border: 2px solid var(--selected); border-radius: inherit; pointer-events: none; animation: tile-swap-ring 540ms ease-out both; }
+.tile.is-dragging { opacity: .25; }
+.tile.drop-target { outline: 3px dashed var(--selected); outline-offset: 3px; }
+.tile-preview { z-index: 100; pointer-events: none; opacity: .82; border: 2px dashed var(--selected) !important; box-shadow: 0 12px 35px rgb(0 0 0 / 18%); transform-origin: top left; }
 
 .header-panel { position: absolute; top: 84px; z-index: 10; width: 370px; padding: 25px; border: 1px solid var(--border); border-radius: 16px; background: var(--tile); box-shadow: var(--panel-shadow); }
 .header-panel h2 { margin: 0 0 10px; font-size: 23px; font-weight: 750; letter-spacing: -.6px; }
@@ -181,6 +193,12 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
 .toast svg { flex: none; width: 20px; height: 20px; color: color-mix(in srgb, var(--selected) 70%, var(--text)); }
 .noscript-message { margin: 20px; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes tile-swap-ring { 0% { opacity: 0; transform: scale(.98); } 28% { opacity: .9; transform: scale(1.015); } 100% { opacity: 0; transform: scale(1.035); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tile-layout.is-arranging .tile.tile-move-animating { transition: none; }
+  .tile-layout.is-arranging .tile.tile-swap-participant::after { animation: none; opacity: 0; }
+}
 
 @media (max-width: 1199px) {
   :root {
@@ -228,7 +246,8 @@ svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.7; strok
   .avatar { width: calc(31.25px + 7.75 * var(--reflow-step) - 7 * var(--compact-step)); height: calc(31.25px + 7.75 * var(--reflow-step) - 7 * var(--compact-step)); }
   .profile-button > svg { width: calc(15px + 3 * var(--reflow-step) - 5 * var(--compact-step)); height: calc(15px + 3 * var(--reflow-step) - 5 * var(--compact-step)); }
   main { flex: 1; padding: calc(29.375px + 8.625 * var(--reflow-step) - 9 * var(--compact-step)) var(--content-inset) 24px; }
-  .welcome { position: static; }
+  .welcome { position: static; right: auto; }
+  .arrange-button { position: static; margin-top: 14px; }
   .welcome h1 { font-size: calc(36.25px + 3.75 * var(--reflow-step) - 11 * var(--compact-step)); letter-spacing: -1px; }
   .welcome p { margin-top: calc(4.375px + 1.625 * var(--reflow-step)); font-size: calc(20px + 3 * var(--reflow-step) - 6 * var(--compact-step)); letter-spacing: -.5px; }
   .tile-layout {

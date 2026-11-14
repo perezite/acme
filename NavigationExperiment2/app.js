@@ -41,9 +41,12 @@
   const profileButton = document.getElementById('profile-button');
   const panels = [document.getElementById('notifications-panel'), document.getElementById('profile-panel')];
   const tileButtons = new Map();
+  let selectedTileId = 'projekte';
   let toastTimer;
   let searchTimer;
   let activeResultIndex = -1;
+  let arranging = false;
+  let dragState = null;
 
   function makeIcon(name) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -56,7 +59,10 @@
 
   function buildTiles() {
     const columns = 8;
-    const tilesByCell = new Map(tiles.map(tile => [(tile.row - 1) * columns + tile.column - 1, tile]));
+    layout.replaceChildren();
+    tileButtons.clear();
+    const orderedTiles = [...tiles].sort((a, b) => a.row - b.row || a.column - b.column);
+    const tilesByCell = new Map(orderedTiles.map(tile => [(tile.row - 1) * columns + tile.column - 1, tile]));
     const cellCount = Math.max(...tiles.map(tile => tile.row)) * columns;
     for (let cell = 0; cell < cellCount;) {
       const tile = tilesByCell.get(cell);
@@ -64,6 +70,8 @@
         const gap = document.createElement('span');
         gap.className = 'tile-gap';
         gap.setAttribute('aria-hidden', 'true');
+        gap.dataset.column = String(cell % columns + 1);
+        gap.dataset.row = String(Math.floor(cell / columns) + 1);
         gap.style.setProperty('--column', String(cell % columns + 1));
         gap.style.setProperty('--row', String(Math.floor(cell / columns) + 1));
         layout.append(gap);
@@ -76,7 +84,8 @@
       button.type = 'button';
       button.className = `tile${tile.narrow ? ' tile--narrow' : ''}${tile.purple ? ' tile--purple' : ''}`;
       button.dataset.tileId = tile.id;
-      button.setAttribute('aria-pressed', String(tile.id === 'projekte'));
+      button.draggable = false;
+      button.setAttribute('aria-pressed', String(tile.id === selectedTileId));
       for (const property of ['column', 'row']) {
         button.style.setProperty(`--${property}`, String(tile[property]));
       }
@@ -94,10 +103,193 @@
       description.textContent = tile.description;
       copy.append(title, description);
       button.append(icon, copy);
-      button.addEventListener('click', () => selectTile(tile));
+      button.addEventListener('click', event => {
+        selectTile(tile);
+      });
+      button.addEventListener('pointerdown', event => startTileDrag(event, tile, button));
       layout.append(button);
       tileButtons.set(tile.id, button);
     }
+  }
+
+  function startTileDrag(event, tile, button) {
+    if (!arranging || event.button !== 0) return;
+    event.preventDefault();
+    const rect = button.getBoundingClientRect();
+    const preview = button.cloneNode(true);
+    preview.classList.add('tile-preview');
+    preview.removeAttribute('aria-pressed');
+    preview.style.position = 'fixed';
+    preview.style.left = `${rect.left}px`;
+    preview.style.top = `${rect.top}px`;
+    sizeDragPreview(preview, rect);
+    preview.style.setProperty('--column', String(tile.column));
+    preview.style.setProperty('--row', String(tile.row));
+    document.body.append(preview);
+    button.classList.add('is-dragging');
+    dragState = { tile, button, preview, target: null, targetColumn: null, emptyCell: null, startX: event.clientX, startY: event.clientY, moved: false };
+    button.setPointerCapture(event.pointerId);
+    button.addEventListener('pointermove', moveTileDrag);
+    button.addEventListener('pointerup', endTileDrag, { once: true });
+    button.addEventListener('pointercancel', endTileDrag, { once: true });
+  }
+
+  function sizeDragPreview(preview, rect) {
+    const scale = Number.parseFloat(getComputedStyle(root).getPropertyValue('--stage-scale')) || 1;
+    preview.style.width = `${rect.width / scale}px`;
+    preview.style.height = `${rect.height / scale}px`;
+    preview.style.transform = `scale(${scale})`;
+  }
+
+  function animateTileExchange(previousRects, participants) {
+    const scale = Number.parseFloat(getComputedStyle(root).getPropertyValue('--stage-scale')) || 1;
+    const movingButtons = [];
+
+    tileButtons.forEach((button, id) => {
+      const previous = previousRects.get(id);
+      if (!previous) return;
+      const current = button.getBoundingClientRect();
+      const x = (previous.left - current.left) / scale;
+      const y = (previous.top - current.top) / scale;
+      if (Math.hypot(x, y) < 1) return;
+
+      button.classList.add('tile-move-animating');
+      if (participants.has(id)) button.classList.add('tile-swap-participant');
+      button.style.transition = 'none';
+      button.style.transform = `translate(${x}px, ${y}px) scale(.97)`;
+      movingButtons.push(button);
+    });
+
+    if (!movingButtons.length) return;
+    // Commit the starting offsets before easing every changed tile into its new slot.
+    movingButtons[0].getBoundingClientRect();
+    window.requestAnimationFrame(() => {
+      movingButtons.forEach(button => {
+        button.style.removeProperty('transition');
+        button.style.transform = 'translate(0, 0) scale(1)';
+      });
+    });
+    window.setTimeout(() => {
+      movingButtons.forEach(button => {
+        button.classList.remove('tile-move-animating', 'tile-swap-participant');
+        button.style.removeProperty('transform');
+      });
+    }, 560);
+  }
+
+  function moveTileDrag(event) {
+    if (!dragState) return;
+    const { preview, button } = dragState;
+    if (Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY) > 6) dragState.moved = true;
+    const rect = button.getBoundingClientRect();
+    preview.style.left = `${event.clientX - Math.min(rect.width / 2, Math.max(24, event.clientX - rect.left))}px`;
+    preview.style.top = `${event.clientY - Math.min(rect.height / 2, Math.max(24, event.clientY - rect.top))}px`;
+    const hovered = document.elementFromPoint(event.clientX, event.clientY)?.closest('.tile');
+    const target = hovered && hovered !== button ? tileButtons.get(hovered.dataset.tileId) : null;
+    const emptyGap = !target ? document.elementFromPoint(event.clientX, event.clientY)?.closest('.tile-gap') : null;
+    tileButtons.forEach(candidate => candidate.classList.toggle('drop-target', candidate === target));
+    layout.querySelectorAll('.tile-gap').forEach(gap => gap.classList.toggle('drop-slot', gap === emptyGap));
+    const targetTile = target ? tiles.find(item => item.id === target.dataset.tileId) : null;
+    dragState.target = targetTile;
+    if (target) {
+      const targetRect = target.getBoundingClientRect();
+      const draggedSpan = dragState.tile.narrow ? 1 : 2;
+      const targetSpan = targetTile.narrow ? 1 : 2;
+      const placeRight = draggedSpan < targetSpan && event.clientX >= targetRect.left + targetRect.width / 2;
+      dragState.targetColumn = Math.min(8 - draggedSpan + 1, targetTile.column + (placeRight ? targetSpan - draggedSpan : 0));
+      preview.style.left = `${targetRect.left + (placeRight ? targetRect.width - preview.getBoundingClientRect().width : 0)}px`;
+      preview.style.top = `${targetRect.top}px`;
+      dragState.emptyCell = null;
+    } else if (emptyGap) {
+      const rect = emptyGap.getBoundingClientRect();
+      const emptyColumn = Number(emptyGap.dataset.column);
+      const emptyRow = Number(emptyGap.dataset.row);
+      const draggedSpan = dragState.tile.narrow ? 1 : 2;
+      const shiftIntoAdjacentSource = draggedSpan === 2 && emptyRow === dragState.tile.row && emptyColumn === dragState.tile.column + draggedSpan;
+      const targetColumn = Math.min(8 - draggedSpan + 1, emptyColumn - (shiftIntoAdjacentSource ? 1 : 0));
+      dragState.targetColumn = null;
+      dragState.emptyCell = { column: targetColumn, row: emptyRow };
+      const columnGap = Number.parseFloat(getComputedStyle(layout).columnGap) || 0;
+      const stageScale = Number.parseFloat(getComputedStyle(root).getPropertyValue('--stage-scale')) || 1;
+      preview.style.left = `${rect.left - (shiftIntoAdjacentSource ? (rect.width + columnGap * stageScale) : 0)}px`;
+      preview.style.top = `${rect.top}px`;
+    } else {
+      dragState.targetColumn = null;
+      dragState.emptyCell = null;
+    }
+  }
+
+  function endTileDrag() {
+    if (!dragState) return;
+    const { tile, button, preview, target, targetColumn, emptyCell, moved } = dragState;
+    button.removeEventListener('pointermove', moveTileDrag);
+    button.classList.remove('is-dragging');
+    tileButtons.forEach(candidate => candidate.classList.remove('drop-target'));
+    layout.querySelectorAll('.tile-gap').forEach(gap => gap.classList.remove('drop-slot'));
+    preview.remove();
+    dragState = null;
+    if (moved) {
+      const suppressClick = event => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        button.removeEventListener('click', suppressClick, true);
+      };
+      button.addEventListener('click', suppressClick, true);
+      window.setTimeout(() => button.removeEventListener('click', suppressClick, true), 500);
+    }
+    if ((!target && !emptyCell) || (target && target.id === tile.id)) return;
+    const from = { column: tile.column, row: tile.row };
+    const to = target ? { column: targetColumn ?? target.column, row: target.row } : emptyCell;
+    const span = item => item.narrow ? 1 : 2;
+    const overlaps = (a, b) => a.row === b.row && a.column < b.column + span(b) && b.column < a.column + span(a);
+    const moving = { ...tile, ...to };
+    const displaced = tiles.filter(item => item !== tile && overlaps(moving, item));
+    const proposed = [moving, ...tiles.filter(item => item !== tile && !displaced.includes(item))];
+    const displacedPositions = new Map();
+    let noRoom = false;
+    for (const item of displaced) {
+      const candidates = [];
+      for (let row = 1; row <= 5; row += 1) {
+        for (let column = 1; column + span(item) - 1 <= 8; column += 1) {
+          candidates.push({ ...item, column, row });
+        }
+      }
+      candidates.sort((a, b) => {
+        const distance = candidate => Math.abs(candidate.row - from.row) * 9 + Math.abs(candidate.column - from.column);
+        return distance(a) - distance(b);
+      });
+      const position = candidates.find(candidate => proposed.every(other => !overlaps(candidate, other)));
+      if (!position) { noRoom = true; break; }
+      displacedPositions.set(item, position);
+      proposed.push(position);
+    }
+    const invalid = noRoom || moving.column < 1 || moving.column + span(moving) - 1 > 8
+      || proposed.some(item => item.column < 1 || item.column + span(item) - 1 > 8)
+      || proposed.some((item, index) => proposed.slice(index + 1).some(other => overlaps(item, other)));
+    if (invalid) {
+      toast('Dort ist nicht genug Platz für diese Kachelbreiten.');
+      return;
+    }
+    const previousRects = new Map([...tileButtons].map(([id, currentButton]) => [id, currentButton.getBoundingClientRect()]));
+    const swapParticipants = new Set([tile.id]);
+    if (target) swapParticipants.add(target.id);
+    tile.column = to.column; tile.row = to.row;
+    displacedPositions.forEach((position, item) => {
+      item.column = position.column;
+      item.row = position.row;
+    });
+    buildTiles();
+    animateTileExchange(previousRects, swapParticipants);
+    toast(target ? `${tile.title} und ${target.title} haben die Position getauscht.` : `${tile.title} verschoben.`);
+  }
+
+  function setArrangeMode(enabled) {
+    arranging = enabled;
+    layout.classList.toggle('is-arranging', enabled);
+    const button = document.getElementById('arrange-button');
+    button.setAttribute('aria-pressed', String(enabled));
+    button.textContent = enabled ? 'Anordnen beenden' : 'Kacheln anordnen';
+    toast(enabled ? 'Ziehe Kacheln aufeinander, um ihre Plätze zu tauschen.' : 'Anordnen beendet.');
   }
 
   function fitReferenceCanvas() {
@@ -136,6 +328,7 @@
   function selectTile(tile) {
     closePanels();
     closeSearchResults();
+    selectedTileId = tile.id;
     tileButtons.forEach((button, id) => button.setAttribute('aria-pressed', String(id === tile.id)));
     toast(`${tile.title} ausgewählt.`);
   }
@@ -271,6 +464,7 @@
   document.fonts?.ready.then(resizeSearchResults);
 
   document.getElementById('theme-button').addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+  document.getElementById('arrange-button').addEventListener('click', event => setArrangeMode(event.currentTarget.getAttribute('aria-pressed') !== 'true'));
   document.getElementById('profile-theme-button').addEventListener('click', () => { setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'); closePanels(); });
   notificationsButton.addEventListener('click', () => {
     togglePanel(panels[0], notificationsButton);
@@ -327,6 +521,7 @@
     search.value = '';
     updateSearch();
     closePanels();
+    selectedTileId = 'projekte';
     tileButtons.forEach((button, id) => button.setAttribute('aria-pressed', String(id === 'projekte')));
     window.scrollTo({ top: 0, behavior: 'auto' });
   });
