@@ -1,33 +1,32 @@
 (() => {
   'use strict';
 
-  // Desktop placement on an eight-column grid. Wide tiles span two columns;
-  // smaller viewports reflow the same sequence, including its empty cells.
+  // Every tile occupies one cell on the eight-column desktop grid.
   const tiles = [
     { id: 'projekte', title: 'Projekte', description: 'Projekte planen und steuern', icon: 'layers', column: 1, row: 1 },
-    { id: 'aufgaben', title: 'Aufgaben', description: 'Aufgaben erledigen', icon: 'check-square', column: 3, row: 1, narrow: true },
+    { id: 'aufgaben', title: 'Aufgaben', description: 'Aufgaben erledigen', icon: 'check-square', column: 3, row: 1 },
     { id: 'kunden', title: 'Kunden', description: 'Kunden und Kontakte verwalten', icon: 'users', column: 5, row: 1, purple: true },
-    { id: 'kalender', title: 'Kalender', description: 'Termine im Blick', icon: 'calendar', column: 7, row: 1, narrow: true },
-    { id: 'kontakte', title: 'Kontakte', description: 'Kontaktdaten pflegen', icon: 'contact', column: 8, row: 1, narrow: true, purple: true },
+    { id: 'kalender', title: 'Kalender', description: 'Termine im Blick', icon: 'calendar', column: 7, row: 1 },
+    { id: 'kontakte', title: 'Kontakte', description: 'Kontaktdaten pflegen', icon: 'contact', column: 8, row: 1, purple: true },
     { id: 'dokumente', title: 'Dokumente', description: 'Dateien zentral ablegen und teilen', icon: 'document', column: 1, row: 2, purple: true },
-    { id: 'team', title: 'Team', description: 'Rollen und Kapazitäten', icon: 'team', column: 3, row: 2, narrow: true, purple: true },
+    { id: 'team', title: 'Team', description: 'Rollen und Kapazitäten', icon: 'team', column: 3, row: 2, purple: true },
     { id: 'berichte', title: 'Berichte', description: 'Auswertungen und Übersichten', icon: 'bars', column: 4, row: 2 },
     { id: 'finanzen', title: 'Finanzen', description: 'Kosten, Rechnungen und Zahlungen', icon: 'coins', column: 7, row: 2 },
-    { id: 'zeiterfassung', title: 'Zeiterfassung', description: 'Zeiten erfassen', icon: 'clock', column: 1, row: 3, narrow: true },
+    { id: 'zeiterfassung', title: 'Zeiterfassung', description: 'Zeiten erfassen', icon: 'clock', column: 1, row: 3 },
     { id: 'angebote', title: 'Angebote', description: 'Angebote erstellen und versenden', icon: 'offer', column: 3, row: 3 },
-    { id: 'freigaben', title: 'Freigaben', description: 'Anfragen prüfen', icon: 'shield', column: 5, row: 3, narrow: true },
-    { id: 'lager', title: 'Lager', description: 'Bestände und Waren', icon: 'package', column: 6, row: 3, narrow: true, purple: true },
+    { id: 'freigaben', title: 'Freigaben', description: 'Anfragen prüfen', icon: 'shield', column: 5, row: 3 },
+    { id: 'lager', title: 'Lager', description: 'Bestände und Waren', icon: 'package', column: 6, row: 3, purple: true },
     { id: 'auftraege', title: 'Aufträge', description: 'Aufträge planen und abwickeln', icon: 'clipboard', column: 7, row: 3, purple: true },
     { id: 'einkauf', title: 'Einkauf', description: 'Bedarfe anfragen und bestellen', icon: 'cart', column: 1, row: 4, purple: true },
-    { id: 'anlagen', title: 'Anlagen', description: 'Anlagen verwalten', icon: 'settings', column: 3, row: 4, narrow: true },
-    { id: 'nachrichten', title: 'Nachrichten', description: 'Intern kommunizieren', icon: 'mail', column: 4, row: 4, narrow: true, purple: true },
+    { id: 'anlagen', title: 'Anlagen', description: 'Anlagen verwalten', icon: 'settings', column: 3, row: 4 },
+    { id: 'nachrichten', title: 'Nachrichten', description: 'Intern kommunizieren', icon: 'mail', column: 4, row: 4, purple: true },
     { id: 'wissen', title: 'Wissen', description: 'Informationen und Anleitungen', icon: 'book', column: 6, row: 4 },
     { id: 'personal', title: 'Personal', description: 'Mitarbeitende und Rollen verwalten', icon: 'team', column: 2, row: 5 },
-    { id: 'reisen', title: 'Reisen', description: 'Dienstreisen organisieren', icon: 'briefcase', column: 4, row: 5, narrow: true, purple: true },
-    { id: 'support', title: 'Support', description: 'Hilfe und Anfragen', icon: 'headset', column: 5, row: 5, narrow: true },
-    { id: 'statistik', title: 'Statistik', description: 'Kennzahlen im Blick', icon: 'bars', column: 6, row: 5, narrow: true, purple: true },
-    { id: 'einstellungen', title: 'Einstellungen', description: 'System konfigurieren', icon: 'settings', column: 7, row: 5, narrow: true },
-    { id: 'automationen', title: 'Automationen', description: 'Abläufe automatisieren', icon: 'zap', column: 8, row: 5, narrow: true, purple: true },
+    { id: 'reisen', title: 'Reisen', description: 'Dienstreisen organisieren', icon: 'briefcase', column: 4, row: 5, purple: true },
+    { id: 'support', title: 'Support', description: 'Hilfe und Anfragen', icon: 'headset', column: 5, row: 5 },
+    { id: 'statistik', title: 'Statistik', description: 'Kennzahlen im Blick', icon: 'bars', column: 6, row: 5, purple: true },
+    { id: 'einstellungen', title: 'Einstellungen', description: 'System konfigurieren', icon: 'settings', column: 7, row: 5 },
+    { id: 'automationen', title: 'Automationen', description: 'Abläufe automatisieren', icon: 'zap', column: 8, row: 5, purple: true },
   ];
 
   const root = document.documentElement;
@@ -78,18 +77,16 @@
         cell += 1;
         continue;
       }
-      const span = tile.narrow ? 1 : 2;
-      cell += span;
+      cell += 1;
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = `tile${tile.narrow ? ' tile--narrow' : ''}${tile.purple ? ' tile--purple' : ''}`;
+      button.className = `tile${tile.purple ? ' tile--purple' : ''}`;
       button.dataset.tileId = tile.id;
       button.draggable = false;
       button.setAttribute('aria-pressed', String(tile.id === selectedTileId));
       for (const property of ['column', 'row']) {
         button.style.setProperty(`--${property}`, String(tile[property]));
       }
-      button.style.setProperty('--span', String(span));
       const icon = document.createElement('span');
       icon.className = 'tile-icon';
       icon.append(makeIcon(tile.icon));
@@ -193,25 +190,18 @@
     dragState.target = targetTile;
     if (target) {
       const targetRect = target.getBoundingClientRect();
-      const draggedSpan = dragState.tile.narrow ? 1 : 2;
-      const targetSpan = targetTile.narrow ? 1 : 2;
-      const placeRight = draggedSpan < targetSpan && event.clientX >= targetRect.left + targetRect.width / 2;
-      dragState.targetColumn = Math.min(8 - draggedSpan + 1, targetTile.column + (placeRight ? targetSpan - draggedSpan : 0));
-      preview.style.left = `${targetRect.left + (placeRight ? targetRect.width - preview.getBoundingClientRect().width : 0)}px`;
+      dragState.targetColumn = targetTile.column;
+      preview.style.left = `${targetRect.left}px`;
       preview.style.top = `${targetRect.top}px`;
       dragState.emptyCell = null;
     } else if (emptyGap) {
       const rect = emptyGap.getBoundingClientRect();
       const emptyColumn = Number(emptyGap.dataset.column);
       const emptyRow = Number(emptyGap.dataset.row);
-      const draggedSpan = dragState.tile.narrow ? 1 : 2;
-      const shiftIntoAdjacentSource = draggedSpan === 2 && emptyRow === dragState.tile.row && emptyColumn === dragState.tile.column + draggedSpan;
-      const targetColumn = Math.min(8 - draggedSpan + 1, emptyColumn - (shiftIntoAdjacentSource ? 1 : 0));
+      const targetColumn = emptyColumn;
       dragState.targetColumn = null;
       dragState.emptyCell = { column: targetColumn, row: emptyRow };
-      const columnGap = Number.parseFloat(getComputedStyle(layout).columnGap) || 0;
-      const stageScale = Number.parseFloat(getComputedStyle(root).getPropertyValue('--stage-scale')) || 1;
-      preview.style.left = `${rect.left - (shiftIntoAdjacentSource ? (rect.width + columnGap * stageScale) : 0)}px`;
+      preview.style.left = `${rect.left}px`;
       preview.style.top = `${rect.top}px`;
     } else {
       dragState.targetColumn = null;
@@ -240,8 +230,7 @@
     if ((!target && !emptyCell) || (target && target.id === tile.id)) return;
     const from = { column: tile.column, row: tile.row };
     const to = target ? { column: targetColumn ?? target.column, row: target.row } : emptyCell;
-    const span = item => item.narrow ? 1 : 2;
-    const overlaps = (a, b) => a.row === b.row && a.column < b.column + span(b) && b.column < a.column + span(a);
+    const overlaps = (a, b) => a.row === b.row && a.column === b.column;
     const moving = { ...tile, ...to };
     const displaced = tiles.filter(item => item !== tile && overlaps(moving, item));
     const proposed = [moving, ...tiles.filter(item => item !== tile && !displaced.includes(item))];
@@ -250,7 +239,7 @@
     for (const item of displaced) {
       const candidates = [];
       for (let row = 1; row <= 5; row += 1) {
-        for (let column = 1; column + span(item) - 1 <= 8; column += 1) {
+        for (let column = 1; column <= 8; column += 1) {
           candidates.push({ ...item, column, row });
         }
       }
@@ -263,8 +252,8 @@
       displacedPositions.set(item, position);
       proposed.push(position);
     }
-    const invalid = noRoom || moving.column < 1 || moving.column + span(moving) - 1 > 8
-      || proposed.some(item => item.column < 1 || item.column + span(item) - 1 > 8)
+    const invalid = noRoom || moving.column < 1 || moving.column > 8
+      || proposed.some(item => item.column < 1 || item.column > 8)
       || proposed.some((item, index) => proposed.slice(index + 1).some(other => overlaps(item, other)));
     if (invalid) {
       toast('Dort ist nicht genug Platz für diese Kachelbreiten.');

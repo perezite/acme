@@ -18,13 +18,13 @@ Eigenständiger HTML-Prototyp mit einem Screen, möglichst nah an den gelieferte
 
 ## Layout
 
-Die Referenzfläche ist **1920 × 1080 CSS-Pixel** bei 100 % Browser-Zoom. Die Kacheln folgen einem unsichtbaren Raster aus acht gleich breiten Spalten: schmale Kacheln belegen eine Spalte, breite Kacheln zwei. Alle Kacheln sind 136px hoch und haben horizontal wie vertikal 16px Abstand. Die versetzte Anordnung und die Untertitel bleiben erhalten; die Kanten sind auf gemeinsame Fluchten ausgerichtet.
+Die Referenzfläche ist **1920 × 1080 CSS-Pixel** bei 100 % Browser-Zoom. Alle Kacheln sind gleich breit und belegen jeweils eine Spalte eines unsichtbaren Rasters mit acht Spalten. Sie sind 144px hoch und haben horizontal wie vertikal 16px Abstand. Die versetzte Anordnung und die Untertitel bleiben erhalten; die Kanten sind auf gemeinsame Fluchten ausgerichtet.
 
 Ab 1200px Fensterbreite wird die Referenzfläche proportional an die verfügbare Breite angepasst, maximal bis zur Originalgrösse. Bei geringer Fensterhöhe kann die Seite vertikal gescrollt werden. Diese Desktop-Stufe bleibt unverändert.
 
-Unter 1200px ordnen sich die Kacheln in vier Spalten an, unter 680px in zwei Spalten. Breite Kacheln belegen weiterhin zwei Spalten. Unter 680px wechselt die Suche in eine eigene Kopfzeile.
+Unter 1200px ordnen sich die Kacheln in vier Spalten an, unter 680px in zwei Spalten. Unter 680px wechselt die Suche in eine eigene Kopfzeile.
 
-Die sechs leeren Rasterplätze der Desktop-Anordnung bleiben in allen Stufen als unsichtbare, nicht bedienbare Platzhalter erhalten. Beim Umbruch werden sie zusammen mit den Kacheln in ihrer ursprünglichen Reihenfolge angeordnet. Lücken werden nicht nachträglich mit anderen Kacheln aufgefüllt. Passt eine breite Kachel nicht mehr in die verbleibende Zeile, beginnt sie in der nächsten; dadurch können zusätzliche Leerstellen entstehen.
+Leere Rasterplätze der Desktop-Anordnung bleiben in allen Stufen als Platzhalter erhalten und können beim Anordnen als Ablageziel verwendet werden. Beim Umbruch werden sie zusammen mit den Kacheln in ihrer ursprünglichen Reihenfolge angeordnet.
 
 Schrift, Symbole, Kachelhöhen und Abstände ändern sich fliessend. Am Übergang bei 1200px schliessen sie an die mit 62,5 % skalierte Desktop-Fläche an. Bis 1000px gehen sie in die Tablet-Grössen über; zwischen 1000px und 320px werden sie allmählich kompakter. Die Layout-Grenze bei 680px ändert nur die Anordnung, ohne eine neue Grössenstufe einzuführen. Eine zusätzliche Grössenstufe bei 360px entfällt.
 
@@ -33,8 +33,7 @@ Die gemeinsamen CSS-Variablen `--reflow-step` und `--compact-step` steuern diese
 | Text | 1200px Übergang | 1000px Tablet | 320px Mobile |
 | --- | --- | --- | --- |
 | Seitentitel | 36,25px | 40px | 29px |
-| Breite Kachel: Titel / Untertitel | 18,75 / 11,25px | 26 / 16px | 24 / 15px |
-| Schmale Kachel: Titel / Untertitel | 15 / 10,625px | 22 / 15px | 19 / 14px |
+| Kachel: Titel / Untertitel | 15 / 10,625px | 22 / 15px | 19 / 14px |
 
 Die anfängliche Vergrösserung nach dem Umbruch auf vier Spalten schafft mehr Lesbarkeit, ohne den vorherigen abrupten Sprung beim Wechsel der Stufe.
 
