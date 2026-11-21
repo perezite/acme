@@ -15,16 +15,15 @@ Eigenständiger HTML-Prototyp mit einem Screen, möglichst nah an den gelieferte
 - Glocke und Profil öffnen kleine Popover auf demselben Screen. Escape oder ein Klick ausserhalb schliesst sie.
 - Das Logo setzt die Suche und Kachelauswahl zurück. Strg+K bzw. Cmd+K fokussiert die Suche.
 - Buttons und Suche sind per Tastatur bedienbar. Reduzierte Bewegung wird berücksichtigt.
+- Die Kachelpositionen sind fest; Kacheln können nicht umgeordnet werden.
 
 ## Layout
 
-Die Referenzfläche ist **1920 × 1080 CSS-Pixel** bei 100 % Browser-Zoom. Alle Kacheln sind gleich breit und belegen jeweils eine Spalte eines unsichtbaren Rasters mit acht Spalten. Sie sind 144px hoch und haben horizontal wie vertikal 16px Abstand. Die versetzte Anordnung und die Untertitel bleiben erhalten; die Kanten sind auf gemeinsame Fluchten ausgerichtet.
+Die Referenzfläche ist **1920 × 1080 CSS-Pixel** bei 100 % Browser-Zoom. Je vier Plätze bilden eine feste 2×2-Gruppe; jeder Gruppe fehlt eine Kachel an einer unterschiedlich gesetzten Position. Die acht Gruppen fliessen als Ganzes um: vier Gruppen pro Zeile auf Desktop, zwei unter 1200px und eine unter 680px. So werden Kacheln innerhalb einer Gruppe nie getrennt und die ursprünglichen Leerstellen bleiben sichtbar.
 
-Ab 1200px Fensterbreite wird die Referenzfläche proportional an die verfügbare Breite angepasst, maximal bis zur Originalgrösse. Bei geringer Fensterhöhe kann die Seite vertikal gescrollt werden. Diese Desktop-Stufe bleibt unverändert.
+Die Gruppen haben eine sehr dezente, rahmenlose Hintergrundfläche. Ihr Abstand zueinander ist grösser als der Abstand zwischen Kacheln innerhalb einer Gruppe. Die Kacheln sind 136px hoch; bei längeren Texten darf die Gruppe automatisch wachsen. Ab 1200px Fensterbreite wird die Referenzfläche proportional angepasst, maximal bis zur Originalgrösse.
 
-Unter 1200px ordnen sich die Kacheln in vier Spalten an, unter 680px in zwei Spalten. Unter 680px wechselt die Suche in eine eigene Kopfzeile.
-
-Leere Rasterplätze der Desktop-Anordnung bleiben in allen Stufen als Platzhalter erhalten und können beim Anordnen als Ablageziel verwendet werden. Beim Umbruch werden sie zusammen mit den Kacheln in ihrer ursprünglichen Reihenfolge angeordnet.
+Unter 1200px wechseln die Gruppen in zwei Spalten, unter 680px in eine. Die Kacheln bleiben in jeder Gruppe zweispaltig. Unter 680px wechselt die Suche in eine eigene Kopfzeile.
 
 Schrift, Symbole, Kachelhöhen und Abstände ändern sich fliessend. Am Übergang bei 1200px schliessen sie an die mit 62,5 % skalierte Desktop-Fläche an. Bis 1000px gehen sie in die Tablet-Grössen über; zwischen 1000px und 320px werden sie allmählich kompakter. Die Layout-Grenze bei 680px ändert nur die Anordnung, ohne eine neue Grössenstufe einzuführen. Eine zusätzliche Grössenstufe bei 360px entfällt.
 
@@ -33,9 +32,9 @@ Die gemeinsamen CSS-Variablen `--reflow-step` und `--compact-step` steuern diese
 | Text | 1200px Übergang | 1000px Tablet | 320px Mobile |
 | --- | --- | --- | --- |
 | Seitentitel | 36,25px | 40px | 29px |
-| Kachel: Titel / Untertitel | 15 / 10,625px | 22 / 15px | 19 / 14px |
+| Kachel: Titel / Untertitel | 22 / 15px | 22 / 15px | 20 / 13,5px |
 
-Die anfängliche Vergrösserung nach dem Umbruch auf vier Spalten schafft mehr Lesbarkeit, ohne den vorherigen abrupten Sprung beim Wechsel der Stufe.
+Die Kacheln behalten ihre 2×2-Anordnung innerhalb jeder Gruppe über alle Bildschirmgrössen hinweg. Nur die Zahl der Gruppen pro Zeile ändert sich.
 
 ## Dateien
 

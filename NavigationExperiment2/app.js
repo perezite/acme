@@ -1,33 +1,58 @@
 (() => {
   'use strict';
 
-  // Every tile occupies one cell on the eight-column desktop grid.
-  const tiles = [
-    { id: 'projekte', title: 'Projekte', description: 'Projekte planen und steuern', icon: 'layers', column: 1, row: 1 },
-    { id: 'aufgaben', title: 'Aufgaben', description: 'Aufgaben erledigen', icon: 'check-square', column: 3, row: 1 },
-    { id: 'kunden', title: 'Kunden', description: 'Kunden und Kontakte verwalten', icon: 'users', column: 5, row: 1, purple: true },
-    { id: 'kalender', title: 'Kalender', description: 'Termine im Blick', icon: 'calendar', column: 7, row: 1 },
-    { id: 'kontakte', title: 'Kontakte', description: 'Kontaktdaten pflegen', icon: 'contact', column: 8, row: 1, purple: true },
-    { id: 'dokumente', title: 'Dokumente', description: 'Dateien zentral ablegen und teilen', icon: 'document', column: 1, row: 2, purple: true },
-    { id: 'team', title: 'Team', description: 'Rollen und Kapazitäten', icon: 'team', column: 3, row: 2, purple: true },
-    { id: 'berichte', title: 'Berichte', description: 'Auswertungen und Übersichten', icon: 'bars', column: 4, row: 2 },
-    { id: 'finanzen', title: 'Finanzen', description: 'Kosten, Rechnungen und Zahlungen', icon: 'coins', column: 7, row: 2 },
-    { id: 'zeiterfassung', title: 'Zeiterfassung', description: 'Zeiten erfassen', icon: 'clock', column: 1, row: 3 },
-    { id: 'angebote', title: 'Angebote', description: 'Angebote erstellen und versenden', icon: 'offer', column: 3, row: 3 },
-    { id: 'freigaben', title: 'Freigaben', description: 'Anfragen prüfen', icon: 'shield', column: 5, row: 3 },
-    { id: 'lager', title: 'Lager', description: 'Bestände und Waren', icon: 'package', column: 6, row: 3, purple: true },
-    { id: 'auftraege', title: 'Aufträge', description: 'Aufträge planen und abwickeln', icon: 'clipboard', column: 7, row: 3, purple: true },
-    { id: 'einkauf', title: 'Einkauf', description: 'Bedarfe anfragen und bestellen', icon: 'cart', column: 1, row: 4, purple: true },
-    { id: 'anlagen', title: 'Anlagen', description: 'Anlagen verwalten', icon: 'settings', column: 3, row: 4 },
-    { id: 'nachrichten', title: 'Nachrichten', description: 'Intern kommunizieren', icon: 'mail', column: 4, row: 4, purple: true },
-    { id: 'wissen', title: 'Wissen', description: 'Informationen und Anleitungen', icon: 'book', column: 6, row: 4 },
-    { id: 'personal', title: 'Personal', description: 'Mitarbeitende und Rollen verwalten', icon: 'team', column: 2, row: 5 },
-    { id: 'reisen', title: 'Reisen', description: 'Dienstreisen organisieren', icon: 'briefcase', column: 4, row: 5, purple: true },
-    { id: 'support', title: 'Support', description: 'Hilfe und Anfragen', icon: 'headset', column: 5, row: 5 },
-    { id: 'statistik', title: 'Statistik', description: 'Kennzahlen im Blick', icon: 'bars', column: 6, row: 5, purple: true },
-    { id: 'einstellungen', title: 'Einstellungen', description: 'System konfigurieren', icon: 'settings', column: 7, row: 5 },
-    { id: 'automationen', title: 'Automationen', description: 'Abläufe automatisieren', icon: 'zap', column: 8, row: 5, purple: true },
+  // Each module is a fixed 2 × 2 block, so it moves as one unit at breakpoints.
+  const groups = [
+    [
+      { id: 'projekte', title: 'Projekte', description: 'Projekte planen und steuern', icon: 'layers' },
+      { id: 'aufgaben', title: 'Aufgaben', description: 'Aufgaben erledigen', icon: 'check-square' },
+      { id: 'kunden', title: 'Kunden', description: 'Kunden und Kontakte verwalten', icon: 'users', purple: true },
+      null,
+    ],
+    [
+      { id: 'kalender', title: 'Kalender', description: 'Termine im Blick', icon: 'calendar' },
+      null,
+      { id: 'kontakte', title: 'Kontakte', description: 'Kontaktdaten pflegen', icon: 'contact', purple: true },
+      { id: 'dokumente', title: 'Dokumente', description: 'Dateien zentral ablegen und teilen', icon: 'document', purple: true },
+    ],
+    [
+      { id: 'team', title: 'Team', description: 'Rollen und Kapazitäten', icon: 'team', purple: true },
+      { id: 'berichte', title: 'Berichte', description: 'Auswertungen und Übersichten', icon: 'bars' },
+      null,
+      { id: 'finanzen', title: 'Finanzen', description: 'Kosten, Rechnungen und Zahlungen', icon: 'coins' },
+    ],
+    [
+      { id: 'zeiterfassung', title: 'Zeiterfassung', description: 'Zeiten erfassen', icon: 'clock' },
+      { id: 'angebote', title: 'Angebote', description: 'Angebote erstellen und versenden', icon: 'offer' },
+      { id: 'freigaben', title: 'Freigaben', description: 'Anfragen prüfen', icon: 'shield' },
+      null,
+    ],
+    [
+      { id: 'lager', title: 'Lager', description: 'Bestände und Waren', icon: 'package', purple: true },
+      { id: 'auftraege', title: 'Aufträge', description: 'Aufträge planen und abwickeln', icon: 'clipboard', purple: true },
+      { id: 'einkauf', title: 'Einkauf', description: 'Bedarfe anfragen und bestellen', icon: 'cart', purple: true },
+      null,
+    ],
+    [
+      null,
+      { id: 'anlagen', title: 'Anlagen', description: 'Anlagen verwalten', icon: 'settings' },
+      { id: 'nachrichten', title: 'Nachrichten', description: 'Intern kommunizieren', icon: 'mail', purple: true },
+      { id: 'wissen', title: 'Wissen', description: 'Informationen und Anleitungen', icon: 'book' },
+    ],
+    [
+      { id: 'personal', title: 'Personal', description: 'Mitarbeitende und Rollen verwalten', icon: 'team' },
+      { id: 'reisen', title: 'Reisen', description: 'Dienstreisen organisieren', icon: 'briefcase', purple: true },
+      null,
+      { id: 'support', title: 'Support', description: 'Hilfe und Anfragen', icon: 'headset' },
+    ],
+    [
+      null,
+      { id: 'statistik', title: 'Statistik', description: 'Kennzahlen im Blick', icon: 'bars', purple: true },
+      { id: 'einstellungen', title: 'Einstellungen', description: 'System konfigurieren', icon: 'settings' },
+      { id: 'automationen', title: 'Automationen', description: 'Abläufe automatisieren', icon: 'zap', purple: true },
+    ],
   ];
+  const tiles = groups.flat().filter(Boolean);
 
   const root = document.documentElement;
   const frame = document.getElementById('stage-frame');
@@ -44,8 +69,6 @@
   let toastTimer;
   let searchTimer;
   let activeResultIndex = -1;
-  let arranging = false;
-  let dragState = null;
 
   function makeIcon(name) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -57,228 +80,47 @@
   }
 
   function buildTiles() {
-    const columns = 8;
-    layout.replaceChildren();
-    tileButtons.clear();
-    const orderedTiles = [...tiles].sort((a, b) => a.row - b.row || a.column - b.column);
-    const tilesByCell = new Map(orderedTiles.map(tile => [(tile.row - 1) * columns + tile.column - 1, tile]));
-    const cellCount = Math.max(...tiles.map(tile => tile.row)) * columns;
-    for (let cell = 0; cell < cellCount;) {
-      const tile = tilesByCell.get(cell);
-      if (!tile) {
-        const gap = document.createElement('span');
-        gap.className = 'tile-gap';
-        gap.setAttribute('aria-hidden', 'true');
-        gap.dataset.column = String(cell % columns + 1);
-        gap.dataset.row = String(Math.floor(cell / columns) + 1);
-        gap.style.setProperty('--column', String(cell % columns + 1));
-        gap.style.setProperty('--row', String(Math.floor(cell / columns) + 1));
-        layout.append(gap);
-        cell += 1;
-        continue;
-      }
-      cell += 1;
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = `tile${tile.purple ? ' tile--purple' : ''}`;
-      button.dataset.tileId = tile.id;
-      button.draggable = false;
-      button.setAttribute('aria-pressed', String(tile.id === selectedTileId));
-      for (const property of ['column', 'row']) {
-        button.style.setProperty(`--${property}`, String(tile[property]));
-      }
-      const icon = document.createElement('span');
-      icon.className = 'tile-icon';
-      icon.append(makeIcon(tile.icon));
-      const copy = document.createElement('span');
-      copy.className = 'tile-copy';
-      const title = document.createElement('span');
-      title.className = 'tile-title';
-      title.textContent = tile.title;
-      const description = document.createElement('span');
-      description.className = 'tile-description';
-      description.textContent = tile.description;
-      copy.append(title, description);
-      button.append(icon, copy);
-      button.addEventListener('click', event => {
-        selectTile(tile);
-      });
-      button.addEventListener('pointerdown', event => startTileDrag(event, tile, button));
-      layout.append(button);
-      tileButtons.set(tile.id, button);
-    }
-  }
+    groups.forEach((group, index) => {
+      const groupElement = document.createElement('div');
+      groupElement.className = 'tile-group';
+      groupElement.setAttribute('role', 'group');
+      groupElement.setAttribute('aria-label', `Kachelgruppe ${index + 1}`);
 
-  function startTileDrag(event, tile, button) {
-    if (!arranging || event.button !== 0) return;
-    event.preventDefault();
-    const rect = button.getBoundingClientRect();
-    const preview = button.cloneNode(true);
-    preview.classList.add('tile-preview');
-    preview.removeAttribute('aria-pressed');
-    preview.style.position = 'fixed';
-    preview.style.left = `${rect.left}px`;
-    preview.style.top = `${rect.top}px`;
-    sizeDragPreview(preview, rect);
-    preview.style.setProperty('--column', String(tile.column));
-    preview.style.setProperty('--row', String(tile.row));
-    document.body.append(preview);
-    button.classList.add('is-dragging');
-    dragState = { tile, button, preview, target: null, targetColumn: null, emptyCell: null, startX: event.clientX, startY: event.clientY, moved: false };
-    button.setPointerCapture(event.pointerId);
-    button.addEventListener('pointermove', moveTileDrag);
-    button.addEventListener('pointerup', endTileDrag, { once: true });
-    button.addEventListener('pointercancel', endTileDrag, { once: true });
-  }
-
-  function sizeDragPreview(preview, rect) {
-    const scale = Number.parseFloat(getComputedStyle(root).getPropertyValue('--stage-scale')) || 1;
-    preview.style.width = `${rect.width / scale}px`;
-    preview.style.height = `${rect.height / scale}px`;
-    preview.style.transform = `scale(${scale})`;
-  }
-
-  function animateTileExchange(previousRects, participants) {
-    const scale = Number.parseFloat(getComputedStyle(root).getPropertyValue('--stage-scale')) || 1;
-    const movingButtons = [];
-
-    tileButtons.forEach((button, id) => {
-      const previous = previousRects.get(id);
-      if (!previous) return;
-      const current = button.getBoundingClientRect();
-      const x = (previous.left - current.left) / scale;
-      const y = (previous.top - current.top) / scale;
-      if (Math.hypot(x, y) < 1) return;
-
-      button.classList.add('tile-move-animating');
-      if (participants.has(id)) button.classList.add('tile-swap-participant');
-      button.style.transition = 'none';
-      button.style.transform = `translate(${x}px, ${y}px) scale(.97)`;
-      movingButtons.push(button);
-    });
-
-    if (!movingButtons.length) return;
-    // Commit the starting offsets before easing every changed tile into its new slot.
-    movingButtons[0].getBoundingClientRect();
-    window.requestAnimationFrame(() => {
-      movingButtons.forEach(button => {
-        button.style.removeProperty('transition');
-        button.style.transform = 'translate(0, 0) scale(1)';
-      });
-    });
-    window.setTimeout(() => {
-      movingButtons.forEach(button => {
-        button.classList.remove('tile-move-animating', 'tile-swap-participant');
-        button.style.removeProperty('transform');
-      });
-    }, 560);
-  }
-
-  function moveTileDrag(event) {
-    if (!dragState) return;
-    const { preview, button } = dragState;
-    if (Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY) > 6) dragState.moved = true;
-    const rect = button.getBoundingClientRect();
-    preview.style.left = `${event.clientX - Math.min(rect.width / 2, Math.max(24, event.clientX - rect.left))}px`;
-    preview.style.top = `${event.clientY - Math.min(rect.height / 2, Math.max(24, event.clientY - rect.top))}px`;
-    const hovered = document.elementFromPoint(event.clientX, event.clientY)?.closest('.tile');
-    const target = hovered && hovered !== button ? tileButtons.get(hovered.dataset.tileId) : null;
-    const emptyGap = !target ? document.elementFromPoint(event.clientX, event.clientY)?.closest('.tile-gap') : null;
-    tileButtons.forEach(candidate => candidate.classList.toggle('drop-target', candidate === target));
-    layout.querySelectorAll('.tile-gap').forEach(gap => gap.classList.toggle('drop-slot', gap === emptyGap));
-    const targetTile = target ? tiles.find(item => item.id === target.dataset.tileId) : null;
-    dragState.target = targetTile;
-    if (target) {
-      const targetRect = target.getBoundingClientRect();
-      dragState.targetColumn = targetTile.column;
-      preview.style.left = `${targetRect.left}px`;
-      preview.style.top = `${targetRect.top}px`;
-      dragState.emptyCell = null;
-    } else if (emptyGap) {
-      const rect = emptyGap.getBoundingClientRect();
-      const emptyColumn = Number(emptyGap.dataset.column);
-      const emptyRow = Number(emptyGap.dataset.row);
-      const targetColumn = emptyColumn;
-      dragState.targetColumn = null;
-      dragState.emptyCell = { column: targetColumn, row: emptyRow };
-      preview.style.left = `${rect.left}px`;
-      preview.style.top = `${rect.top}px`;
-    } else {
-      dragState.targetColumn = null;
-      dragState.emptyCell = null;
-    }
-  }
-
-  function endTileDrag() {
-    if (!dragState) return;
-    const { tile, button, preview, target, targetColumn, emptyCell, moved } = dragState;
-    button.removeEventListener('pointermove', moveTileDrag);
-    button.classList.remove('is-dragging');
-    tileButtons.forEach(candidate => candidate.classList.remove('drop-target'));
-    layout.querySelectorAll('.tile-gap').forEach(gap => gap.classList.remove('drop-slot'));
-    preview.remove();
-    dragState = null;
-    if (moved) {
-      const suppressClick = event => {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        button.removeEventListener('click', suppressClick, true);
-      };
-      button.addEventListener('click', suppressClick, true);
-      window.setTimeout(() => button.removeEventListener('click', suppressClick, true), 500);
-    }
-    if ((!target && !emptyCell) || (target && target.id === tile.id)) return;
-    const from = { column: tile.column, row: tile.row };
-    const to = target ? { column: targetColumn ?? target.column, row: target.row } : emptyCell;
-    const overlaps = (a, b) => a.row === b.row && a.column === b.column;
-    const moving = { ...tile, ...to };
-    const displaced = tiles.filter(item => item !== tile && overlaps(moving, item));
-    const proposed = [moving, ...tiles.filter(item => item !== tile && !displaced.includes(item))];
-    const displacedPositions = new Map();
-    let noRoom = false;
-    for (const item of displaced) {
-      const candidates = [];
-      for (let row = 1; row <= 5; row += 1) {
-        for (let column = 1; column <= 8; column += 1) {
-          candidates.push({ ...item, column, row });
+      group.forEach(tile => {
+        if (!tile) {
+          const gap = document.createElement('span');
+          gap.className = 'tile-gap';
+          gap.setAttribute('aria-hidden', 'true');
+          groupElement.append(gap);
+          return;
         }
-      }
-      candidates.sort((a, b) => {
-        const distance = candidate => Math.abs(candidate.row - from.row) * 9 + Math.abs(candidate.column - from.column);
-        return distance(a) - distance(b);
-      });
-      const position = candidates.find(candidate => proposed.every(other => !overlaps(candidate, other)));
-      if (!position) { noRoom = true; break; }
-      displacedPositions.set(item, position);
-      proposed.push(position);
-    }
-    const invalid = noRoom || moving.column < 1 || moving.column > 8
-      || proposed.some(item => item.column < 1 || item.column > 8)
-      || proposed.some((item, index) => proposed.slice(index + 1).some(other => overlaps(item, other)));
-    if (invalid) {
-      toast('Dort ist nicht genug Platz für diese Kachelbreiten.');
-      return;
-    }
-    const previousRects = new Map([...tileButtons].map(([id, currentButton]) => [id, currentButton.getBoundingClientRect()]));
-    const swapParticipants = new Set([tile.id]);
-    if (target) swapParticipants.add(target.id);
-    tile.column = to.column; tile.row = to.row;
-    displacedPositions.forEach((position, item) => {
-      item.column = position.column;
-      item.row = position.row;
-    });
-    buildTiles();
-    animateTileExchange(previousRects, swapParticipants);
-    toast(target ? `${tile.title} und ${target.title} haben die Position getauscht.` : `${tile.title} verschoben.`);
-  }
 
-  function setArrangeMode(enabled) {
-    arranging = enabled;
-    layout.classList.toggle('is-arranging', enabled);
-    const button = document.getElementById('arrange-button');
-    button.setAttribute('aria-pressed', String(enabled));
-    button.textContent = enabled ? 'Anordnen beenden' : 'Kacheln anordnen';
-    toast(enabled ? 'Ziehe Kacheln aufeinander, um ihre Plätze zu tauschen.' : 'Anordnen beendet.');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `tile${tile.purple ? ' tile--purple' : ''}`;
+        button.dataset.tileId = tile.id;
+        button.setAttribute('aria-pressed', String(tile.id === selectedTileId));
+
+        const icon = document.createElement('span');
+        icon.className = 'tile-icon';
+        icon.append(makeIcon(tile.icon));
+
+        const copy = document.createElement('span');
+        copy.className = 'tile-copy';
+        const title = document.createElement('span');
+        title.className = 'tile-title';
+        title.textContent = tile.title;
+        const description = document.createElement('span');
+        description.className = 'tile-description';
+        description.textContent = tile.description;
+        copy.append(title, description);
+        button.append(icon, copy);
+        button.addEventListener('click', () => selectTile(tile));
+        groupElement.append(button);
+        tileButtons.set(tile.id, button);
+      });
+      layout.append(groupElement);
+    });
   }
 
   function fitReferenceCanvas() {
@@ -453,7 +295,6 @@
   document.fonts?.ready.then(resizeSearchResults);
 
   document.getElementById('theme-button').addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
-  document.getElementById('arrange-button').addEventListener('click', event => setArrangeMode(event.currentTarget.getAttribute('aria-pressed') !== 'true'));
   document.getElementById('profile-theme-button').addEventListener('click', () => { setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'); closePanels(); });
   notificationsButton.addEventListener('click', () => {
     togglePanel(panels[0], notificationsButton);
