@@ -69,6 +69,8 @@
   let toastTimer;
   let searchTimer;
   let activeResultIndex = -1;
+  let arranging = false;
+  let dragState = null;
 
   function makeIcon(name) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -80,17 +82,21 @@
   }
 
   function buildTiles() {
+    layout.replaceChildren();
+    tileButtons.clear();
     groups.forEach((group, index) => {
       const groupElement = document.createElement('div');
       groupElement.className = 'tile-group';
       groupElement.setAttribute('role', 'group');
       groupElement.setAttribute('aria-label', `Kachelgruppe ${index + 1}`);
 
-      group.forEach(tile => {
+      group.forEach((tile, slotIndex) => {
         if (!tile) {
           const gap = document.createElement('span');
           gap.className = 'tile-gap';
           gap.setAttribute('aria-hidden', 'true');
+          gap.dataset.groupIndex = String(index);
+          gap.dataset.slotIndex = String(slotIndex);
           groupElement.append(gap);
           return;
         }
@@ -98,7 +104,6 @@
         const button = document.createElement('button');
         button.type = 'button';
         button.className = `tile${tile.purple ? ' tile--purple' : ''}`;
-        button.dataset.tileId = tile.id;
         button.setAttribute('aria-pressed', String(tile.id === selectedTileId));
 
         const icon = document.createElement('span');
@@ -116,11 +121,102 @@
         copy.append(title, description);
         button.append(icon, copy);
         button.addEventListener('click', () => selectTile(tile));
+        button.addEventListener('pointerdown', event => startTileDrag(event, tile, button, index, slotIndex));
         groupElement.append(button);
         tileButtons.set(tile.id, button);
       });
       layout.append(groupElement);
     });
+  }
+
+  function startTileDrag(event, tile, button, groupIndex, slotIndex) {
+    if (!arranging || event.button !== 0) return;
+    event.preventDefault();
+
+    const rect = button.getBoundingClientRect();
+    const scale = Number.parseFloat(getComputedStyle(root).getPropertyValue('--stage-scale')) || 1;
+    const preview = button.cloneNode(true);
+    preview.classList.add('tile-preview');
+    preview.removeAttribute('aria-pressed');
+    preview.style.position = 'fixed';
+    preview.style.left = `${rect.left}px`;
+    preview.style.top = `${rect.top}px`;
+    preview.style.width = `${rect.width / scale}px`;
+    preview.style.height = `${rect.height / scale}px`;
+    preview.style.transform = `scale(${scale})`;
+    document.body.append(preview);
+
+    dragState = {
+      tile, button, preview, groupIndex, slotIndex,
+      targetGroupIndex: null, targetSlotIndex: null,
+      startX: event.clientX, startY: event.clientY, moved: false,
+    };
+    button.setPointerCapture(event.pointerId);
+    button.addEventListener('pointermove', moveTileDrag);
+    button.addEventListener('pointerup', endTileDrag, { once: true });
+    button.addEventListener('pointercancel', endTileDrag, { once: true });
+  }
+
+  function moveTileDrag(event) {
+    if (!dragState) return;
+    const { preview, button } = dragState;
+    if (Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY) > 6) dragState.moved = true;
+
+    const previewRect = preview.getBoundingClientRect();
+    preview.style.left = `${event.clientX - previewRect.width / 2}px`;
+    preview.style.top = `${event.clientY - previewRect.height / 2}px`;
+
+    const gap = document.elementFromPoint(event.clientX, event.clientY)?.closest('.tile-gap');
+    layout.querySelectorAll('.tile-gap').forEach(cell => cell.classList.toggle('drop-slot', cell === gap));
+    dragState.targetGroupIndex = gap ? Number(gap.dataset.groupIndex) : null;
+    dragState.targetSlotIndex = gap ? Number(gap.dataset.slotIndex) : null;
+
+    if (gap) {
+      const rect = gap.getBoundingClientRect();
+      preview.style.left = `${rect.left}px`;
+      preview.style.top = `${rect.top}px`;
+    }
+    button.classList.toggle('is-dragging', dragState.moved);
+  }
+
+  function endTileDrag() {
+    if (!dragState) return;
+    const { tile, button, preview, groupIndex, slotIndex, targetGroupIndex, targetSlotIndex, moved } = dragState;
+    button.removeEventListener('pointermove', moveTileDrag);
+    button.classList.remove('is-dragging');
+    layout.querySelectorAll('.tile-gap').forEach(cell => cell.classList.remove('drop-slot'));
+    preview.remove();
+    dragState = null;
+
+    if (moved) {
+      const suppressClick = event => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        button.removeEventListener('click', suppressClick, true);
+      };
+      button.addEventListener('click', suppressClick, true);
+      window.setTimeout(() => button.removeEventListener('click', suppressClick, true), 500);
+    }
+    if (!moved) return;
+    if (targetGroupIndex === null || targetSlotIndex === null) {
+      toast('Ziehe die Kachel auf einen freien Platz.');
+      return;
+    }
+    if (groups[targetGroupIndex][targetSlotIndex] !== null || groups[groupIndex][slotIndex] !== tile) return;
+
+    groups[groupIndex][slotIndex] = null;
+    groups[targetGroupIndex][targetSlotIndex] = tile;
+    buildTiles();
+    toast(`${tile.title} verschoben.`);
+  }
+
+  function setArrangeMode(enabled) {
+    arranging = enabled;
+    layout.classList.toggle('is-arranging', enabled);
+    const button = document.getElementById('arrange-button');
+    button.setAttribute('aria-pressed', String(enabled));
+    button.textContent = enabled ? 'Anordnen beenden' : 'Kacheln anordnen';
+    toast(enabled ? 'Ziehe Kacheln auf freie Plätze.' : 'Anordnen beendet.');
   }
 
   function fitReferenceCanvas() {
@@ -295,6 +391,7 @@
   document.fonts?.ready.then(resizeSearchResults);
 
   document.getElementById('theme-button').addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
+  document.getElementById('arrange-button').addEventListener('click', event => setArrangeMode(event.currentTarget.getAttribute('aria-pressed') !== 'true'));
   document.getElementById('profile-theme-button').addEventListener('click', () => { setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'); closePanels(); });
   notificationsButton.addEventListener('click', () => {
     togglePanel(panels[0], notificationsButton);

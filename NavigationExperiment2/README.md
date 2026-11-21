@@ -15,7 +15,7 @@ Eigenständiger HTML-Prototyp mit einem Screen, möglichst nah an den gelieferte
 - Glocke und Profil öffnen kleine Popover auf demselben Screen. Escape oder ein Klick ausserhalb schliesst sie.
 - Das Logo setzt die Suche und Kachelauswahl zurück. Strg+K bzw. Cmd+K fokussiert die Suche.
 - Buttons und Suche sind per Tastatur bedienbar. Reduzierte Bewegung wird berücksichtigt.
-- Die Kachelpositionen sind fest; Kacheln können nicht umgeordnet werden.
+- Über «Kacheln anordnen» lässt sich eine Kachel auf einen freien Platz in einer der Gruppen ziehen. Belegte Plätze nehmen keine Kachel an; es gibt keinen Tausch. Der Ausgangsplatz wird nach dem Verschieben frei.
 
 ## Layout
 
